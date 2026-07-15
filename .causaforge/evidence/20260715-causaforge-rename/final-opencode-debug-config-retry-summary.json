@@ -1,0 +1,7 @@
+{
+  "command": "final opencode debug config retry with local CausaForge dist plugin",
+  "exit_code": 0,
+  "live_db_before": "280",
+  "live_db_after": "280",
+  "output": "final-opencode-debug-config-retry.txt"
+}

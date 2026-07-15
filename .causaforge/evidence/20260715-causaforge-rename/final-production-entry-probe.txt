@@ -1,0 +1,22 @@
+## production entry probe after final build
+[
+  'WorkflowOpenCodeConfigSchema',
+  'createCompactionSnapshot',
+  'createPhaseContext',
+  'createPluginModule',
+  'createWorkflowAgents',
+  'createWorkflowOpenCodeContext',
+  'createWorkflowPlugin',
+  'createWorkflowTools',
+  'default',
+  'evaluateStopGate',
+  'evaluateToolPermission',
+  'parseWorkflowConfig',
+  'recordCommandEvidence',
+  'renderPhaseContext',
+  'restoreCompactionState'
+]
+default id causaforge-agent
+server function
+factory id causaforge-agent
+4.17.0

@@ -1,0 +1,23 @@
+## import shape
+[
+  'WorkflowOpenCodeConfigSchema',
+  'createCompactionSnapshot',
+  'createPhaseContext',
+  'createPluginModule',
+  'createWorkflowAgents',
+  'createWorkflowOpenCodeContext',
+  'createWorkflowPlugin',
+  'createWorkflowTools',
+  'default',
+  'evaluateStopGate',
+  'evaluateToolPermission',
+  'parseWorkflowConfig',
+  'recordCommandEvidence',
+  'renderPhaseContext',
+  'restoreCompactionState'
+]
+default id causaforge-agent
+server function
+factory id causaforge-agent
+## cli
+4.17.0

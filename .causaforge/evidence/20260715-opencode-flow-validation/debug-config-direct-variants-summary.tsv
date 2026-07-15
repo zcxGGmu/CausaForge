@@ -1,0 +1,5 @@
+case	exit_code	timed_out	live_db_before	live_db_after	output_file
+wrapper-same-id	0	False	280	280	debug-config-direct-variants-wrapper-same-id.txt
+wrapper-default-id	0	False	280	280	debug-config-direct-variants-wrapper-default-id.txt
+wrapper-default-server-only	0	False	280	280	debug-config-direct-variants-wrapper-default-server-only.txt
+wrapper-default-direct	0	False	280	280	debug-config-direct-variants-wrapper-default-direct.txt

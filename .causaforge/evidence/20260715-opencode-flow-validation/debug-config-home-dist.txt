@@ -1,0 +1,14 @@
+timestamp=2026-07-15T13:41:40.044Z level=INFO run=b1a4bf6e message="creating instance" directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:41:40.046Z level=INFO run=b1a4bf6e message=fromDirectory directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:41:40.058Z level=INFO run=b1a4bf6e message=bootstrapping directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:41:40.064Z level=INFO run=b1a4bf6e message=loading path=<ISOLATED_HOME_XDG>/config/opencode/config.json
+timestamp=2026-07-15T13:41:40.070Z level=INFO run=b1a4bf6e message=loading path=<ISOLATED_HOME_XDG>/config/opencode/opencode.json
+timestamp=2026-07-15T13:41:40.070Z level=INFO run=b1a4bf6e message=loading path=<ISOLATED_HOME_XDG>/config/opencode/opencode.jsonc
+timestamp=2026-07-15T13:41:40.193Z level=DEBUG run=b1a4bf6e message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.json"
+timestamp=2026-07-15T13:41:40.193Z level=INFO run=b1a4bf6e message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.json
+timestamp=2026-07-15T13:41:40.202Z level=DEBUG run=b1a4bf6e message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.jsonc"
+timestamp=2026-07-15T13:41:40.202Z level=INFO run=b1a4bf6e message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.jsonc
+
+PY_TIMEOUT_AFTER_SECONDS=45
+
+PY_EXIT_CODE=124

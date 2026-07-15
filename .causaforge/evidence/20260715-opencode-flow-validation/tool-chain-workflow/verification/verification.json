@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "workflowId": "wf-real-001",
+  "artifactId": "verification-001",
+  "createdAt": "2026-07-15T00:00:00.000Z",
+  "patchCandidateArtifactId": "patch-candidate-001",
+  "commands": [
+    {
+      "command": "bun test src/migrate.test.ts",
+      "exitCode": 0
+    }
+  ],
+  "checks": [
+    {
+      "name": "migration regression",
+      "required": true,
+      "status": "pass",
+      "evidence": "Regression assertion passes."
+    }
+  ],
+  "criteria": [
+    {
+      "criterionId": "criterion-001",
+      "status": "pass",
+      "evidence": "The required field is present."
+    }
+  ],
+  "omissions": [],
+  "residualRisks": [],
+  "status": "pass"
+}

@@ -1,0 +1,201 @@
+[
+  [
+    "start",
+    {
+      "schemaVersion": "1.0",
+      "workflowId": "wf-real-001",
+      "phase": "root_cause",
+      "status": "active",
+      "entryMode": "problem-description",
+      "artifactRefs": {},
+      "builderSessionId": null,
+      "reviewerSessionId": null,
+      "createdAt": "2026-07-15T00:00:00.000Z",
+      "updatedAt": "2026-07-15T00:00:00.000Z",
+      "completedAt": null
+    }
+  ],
+  [
+    "record-root-cause",
+    {
+      "artifactPath": "<TEMP_PROJECT>/.workflow/wf-real-001/root-cause/root-cause.json",
+      "markdownPath": "<TEMP_PROJECT>/.workflow/wf-real-001/root-cause/root-cause.md"
+    }
+  ],
+  [
+    "to-planning",
+    {
+      "schemaVersion": "1.0",
+      "workflowId": "wf-real-001",
+      "phase": "planning",
+      "status": "active",
+      "entryMode": "problem-description",
+      "artifactRefs": {
+        "rootCauseArtifactId": "root-cause-001"
+      },
+      "builderSessionId": null,
+      "reviewerSessionId": null,
+      "createdAt": "2026-07-15T00:00:00.000Z",
+      "updatedAt": "2026-07-15T00:05:00.000Z",
+      "completedAt": null
+    }
+  ],
+  [
+    "record-plan",
+    {
+      "artifactPath": "<TEMP_PROJECT>/.workflow/wf-real-001/planning/patch-plan.json",
+      "markdownPath": "<TEMP_PROJECT>/.workflow/wf-real-001/planning/patch-plan.md"
+    }
+  ],
+  [
+    "to-building",
+    {
+      "schemaVersion": "1.0",
+      "workflowId": "wf-real-001",
+      "phase": "building",
+      "status": "active",
+      "entryMode": "problem-description",
+      "artifactRefs": {
+        "rootCauseArtifactId": "root-cause-001",
+        "patchPlanArtifactId": "patch-plan-001"
+      },
+      "builderSessionId": null,
+      "reviewerSessionId": null,
+      "createdAt": "2026-07-15T00:00:00.000Z",
+      "updatedAt": "2026-07-15T00:10:00.000Z",
+      "completedAt": null
+    }
+  ],
+  [
+    "capture-diff",
+    {
+      "patchPath": "<TEMP_PROJECT>/.workflow/wf-real-001/implementation/patch.diff",
+      "changedFiles": [
+        "src/migrate.ts"
+      ]
+    }
+  ],
+  [
+    "record-candidate",
+    {
+      "artifactPath": "<TEMP_PROJECT>/.workflow/wf-real-001/implementation/patch-candidate.json",
+      "markdownPath": null
+    }
+  ],
+  [
+    "to-verifying",
+    {
+      "schemaVersion": "1.0",
+      "workflowId": "wf-real-001",
+      "phase": "verifying",
+      "status": "active",
+      "entryMode": "problem-description",
+      "artifactRefs": {
+        "rootCauseArtifactId": "root-cause-001",
+        "patchPlanArtifactId": "patch-plan-001",
+        "patchCandidateArtifactId": "patch-candidate-001"
+      },
+      "builderSessionId": "session-builder-001",
+      "reviewerSessionId": null,
+      "createdAt": "2026-07-15T00:00:00.000Z",
+      "updatedAt": "2026-07-15T00:15:00.000Z",
+      "completedAt": null
+    }
+  ],
+  [
+    "record-verification",
+    {
+      "artifactPath": "<TEMP_PROJECT>/.workflow/wf-real-001/verification/verification.json",
+      "markdownPath": "<TEMP_PROJECT>/.workflow/wf-real-001/verification/verification.md"
+    }
+  ],
+  [
+    "to-reviewing",
+    {
+      "schemaVersion": "1.0",
+      "workflowId": "wf-real-001",
+      "phase": "reviewing",
+      "status": "active",
+      "entryMode": "problem-description",
+      "artifactRefs": {
+        "rootCauseArtifactId": "root-cause-001",
+        "patchPlanArtifactId": "patch-plan-001",
+        "patchCandidateArtifactId": "patch-candidate-001",
+        "verificationArtifactId": "verification-001"
+      },
+      "builderSessionId": "session-builder-001",
+      "reviewerSessionId": "session-reviewer-001",
+      "createdAt": "2026-07-15T00:00:00.000Z",
+      "updatedAt": "2026-07-15T00:20:00.000Z",
+      "completedAt": null
+    }
+  ],
+  [
+    "record-review",
+    {
+      "artifactPath": "<TEMP_PROJECT>/.workflow/wf-real-001/review/review.json",
+      "markdownPath": "<TEMP_PROJECT>/.workflow/wf-real-001/review/review.md"
+    }
+  ],
+  [
+    "to-delivering",
+    {
+      "schemaVersion": "1.0",
+      "workflowId": "wf-real-001",
+      "phase": "delivering",
+      "status": "active",
+      "entryMode": "problem-description",
+      "artifactRefs": {
+        "rootCauseArtifactId": "root-cause-001",
+        "patchPlanArtifactId": "patch-plan-001",
+        "patchCandidateArtifactId": "patch-candidate-001",
+        "verificationArtifactId": "verification-001",
+        "reviewArtifactId": "review-001"
+      },
+      "builderSessionId": "session-builder-001",
+      "reviewerSessionId": "session-reviewer-001",
+      "createdAt": "2026-07-15T00:00:00.000Z",
+      "updatedAt": "2026-07-15T00:25:00.000Z",
+      "completedAt": null
+    }
+  ],
+  [
+    "record-delivery",
+    {
+      "artifactPath": "<TEMP_PROJECT>/.workflow/wf-real-001/delivery/delivery-package.json",
+      "markdownPath": "<TEMP_PROJECT>/.workflow/wf-real-001/delivery/delivery-package.md"
+    }
+  ],
+  [
+    "complete",
+    {
+      "schemaVersion": "1.0",
+      "workflowId": "wf-real-001",
+      "phase": "completed",
+      "status": "completed",
+      "entryMode": "problem-description",
+      "artifactRefs": {
+        "rootCauseArtifactId": "root-cause-001",
+        "patchPlanArtifactId": "patch-plan-001",
+        "patchCandidateArtifactId": "patch-candidate-001",
+        "verificationArtifactId": "verification-001",
+        "reviewArtifactId": "review-001",
+        "deliveryArtifactId": "delivery-001"
+      },
+      "builderSessionId": "session-builder-001",
+      "reviewerSessionId": "session-reviewer-001",
+      "createdAt": "2026-07-15T00:00:00.000Z",
+      "updatedAt": "2026-07-15T00:35:00.000Z",
+      "completedAt": "2026-07-15T00:35:00.000Z"
+    }
+  ],
+  [
+    "status",
+    {
+      "workflowId": "wf-real-001",
+      "phase": "completed",
+      "status": "completed",
+      "missing": []
+    }
+  ]
+]

@@ -1,0 +1,71 @@
+{
+  "plugin": [
+    "file://<WORKTREE>"
+  ],
+  "$schema": "https://opencode.ai/config.json",
+  "plugin_origins": [
+    {
+      "spec": "file://<WORKTREE>",
+      "source": "/private<TEMP_PROJECT>/.opencode/opencode.json",
+      "scope": "local"
+    }
+  ],
+  "agent": {
+    "workflow-orchestrator": {
+      "description": "Coordinates the workflow lifecycle and delegates phase-specific work.",
+      "mode": "primary",
+      "prompt": "Current responsibility: Own intake, phase coordination, handoffs, and final user-facing workflow status.\n\nProhibited:\n- Do not write phase artifacts directly.\n- Do not bypass required verification, review, or delivery gates.\n- Do not rename workflow roles or use legacy role aliases.\n\nAllowed artifact kind: none\n\nState transitions: Request transitions only after the responsible phase agent has recorded the required artifact.\n\nRequest state transitions through workflow_transition after recording required evidence.\n\nDo not edit workflow.json directly; use workflow tools and let the store persist state.\n\nNotes:\n- Delegate specialized work to the normalized workflow subagents."
+    },
+    "root-cause-analyst": {
+      "description": "Investigates the problem and records a confirmed root cause artifact.",
+      "mode": "subagent",
+      "prompt": "Current responsibility: Reproduce or reason from evidence, identify the causal chain, and record the confirmed root cause.\n\nProhibited:\n- Do not implement code changes.\n- Do not propose a patch before the root cause is evidenced.\n- Do not record unconfirmed hypotheses as final artifacts.\n\nAllowed artifact kind: root-cause\n\nState transitions: Request root_cause to planning only after recording a confirmed root-cause artifact.\n\nRequest state transitions through workflow_transition after recording required evidence.\n\nDo not edit workflow.json directly; use workflow tools and let the store persist state."
+    },
+    "patch-planner": {
+      "description": "Converts the root cause into an approved patch plan.",
+      "mode": "subagent",
+      "prompt": "Current responsibility: Create the minimal approved file-change plan tied to root cause criteria and verification steps.\n\nProhibited:\n- Do not modify product code.\n- Do not plan files unrelated to the confirmed root cause.\n- Do not weaken verification criteria.\n\nAllowed artifact kind: patch-plan\n\nState transitions: Request planning to building only after recording an approved patch-plan artifact.\n\nRequest state transitions through workflow_transition after recording required evidence.\n\nDo not edit workflow.json directly; use workflow tools and let the store persist state."
+    },
+    "patch-builder": {
+      "description": "Implements the approved patch and records the patch candidate artifact.",
+      "mode": "subagent",
+      "prompt": "Current responsibility: Modify only approved product files, keep the patch minimal, and capture implementation notes.\n\nProhibited:\n- Do not edit files outside the approved plan unless deviation is explicitly allowed and recorded.\n- Do not skip tests that define the intended behavior.\n- Do not self-approve the patch for review.\n\nAllowed artifact kind: patch-candidate\n\nState transitions: Request building to verifying only after recording a ready_for_verification patch-candidate artifact.\n\nRequest state transitions through workflow_transition after recording required evidence.\n\nDo not edit workflow.json directly; use workflow tools and let the store persist state.\n\nNotes:\n- This is the only workflow role allowed to modify product code."
+    },
+    "regression-verifier": {
+      "description": "Runs verification and records evidence against the root cause criteria.",
+      "mode": "subagent",
+      "prompt": "Current responsibility: Run targeted and relevant broader checks, record commands, results, omissions, and residual risk.\n\nProhibited:\n- Do not modify product code.\n- Do not mark verification pass with failed required checks.\n- Do not omit command output or skipped checks from evidence.\n\nAllowed artifact kind: verification\n\nState transitions: Request verifying to reviewing only after recording a passing verification artifact.\n\nRequest state transitions through workflow_transition after recording required evidence.\n\nDo not edit workflow.json directly; use workflow tools and let the store persist state."
+    },
+    "patch-reviewer": {
+      "description": "Independently reviews the patch candidate and verification evidence.",
+      "mode": "subagent",
+      "prompt": "Current responsibility: Review root cause elimination, approved scope, verification sufficiency, and blocking risks.\n\nProhibited:\n- Do not modify product code.\n- Do not review from the same session that built the patch.\n- Do not pass a review that contains blocking findings.\n\nAllowed artifact kind: review\n\nState transitions: Request reviewing to delivering only after recording a passing review artifact.\n\nRequest state transitions through workflow_transition after recording required evidence.\n\nDo not edit workflow.json directly; use workflow tools and let the store persist state."
+    },
+    "delivery-coordinator": {
+      "description": "Packages final evidence and handoff instructions for completion.",
+      "mode": "subagent",
+      "prompt": "Current responsibility: Assemble the final delivery package, summarize fix, verification, review, residual risks, and handoff.\n\nProhibited:\n- Do not change product code.\n- Do not alter implementation patch content during delivery.\n- Do not complete workflows with incomplete upstream artifacts.\n\nAllowed artifact kind: delivery\n\nState transitions: Request delivering to completed only after recording a complete delivery artifact.\n\nRequest state transitions through workflow_transition after recording required evidence.\n\nDo not edit workflow.json directly; use workflow tools and let the store persist state."
+    }
+  },
+  "mode": {},
+  "command": {},
+  "username": "zq"
+}
+timestamp=2026-07-15T13:37:53.608Z level=INFO run=81fe168f message="creating instance" directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:37:53.610Z level=INFO run=81fe168f message=fromDirectory directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:37:53.618Z level=INFO run=81fe168f message=bootstrapping directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:37:53.623Z level=INFO run=81fe168f message=loading path=<ISOLATED_XDG>/config/opencode/config.json
+timestamp=2026-07-15T13:37:53.627Z level=INFO run=81fe168f message=loading path=<ISOLATED_XDG>/config/opencode/opencode.json
+timestamp=2026-07-15T13:37:53.636Z level=INFO run=81fe168f message=loading path=<ISOLATED_XDG>/config/opencode/opencode.jsonc
+timestamp=2026-07-15T13:37:53.663Z level=DEBUG run=81fe168f message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.json"
+timestamp=2026-07-15T13:37:53.663Z level=INFO run=81fe168f message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.json
+timestamp=2026-07-15T13:37:53.752Z level=DEBUG run=81fe168f message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.jsonc"
+timestamp=2026-07-15T13:37:53.752Z level=INFO run=81fe168f message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.jsonc
+timestamp=2026-07-15T13:37:53.761Z level=DEBUG run=81fe168f message="loading config from /Users/zq/.opencode/opencode.json"
+timestamp=2026-07-15T13:37:53.761Z level=INFO run=81fe168f message=loading path=/Users/zq/.opencode/opencode.json
+timestamp=2026-07-15T13:37:53.762Z level=DEBUG run=81fe168f message="loading config from /Users/zq/.opencode/opencode.jsonc"
+timestamp=2026-07-15T13:37:53.762Z level=INFO run=81fe168f message=loading path=/Users/zq/.opencode/opencode.jsonc
+timestamp=2026-07-15T13:38:03.814Z level=INFO run=81fe168f message="all LSPs are disabled"
+timestamp=2026-07-15T13:38:03.815Z level=INFO run=81fe168f message="all formatters are disabled"
+timestamp=2026-07-15T13:38:03.815Z level=INFO run=81fe168f message=init
+timestamp=2026-07-15T13:38:03.817Z level=INFO run=81fe168f message="disposing instance" directory=/private<TEMP_PROJECT>

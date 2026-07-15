@@ -1,0 +1,23 @@
+{
+  "name": "@causaforge/opencode-adapter",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "OpenCode adapter for the CausaForge evidence-chain workflow.",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "types": "./index.d.ts",
+  "dependencies": {
+    "@opencode-ai/plugin": "1.15.13",
+    "@causaforge/core": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "scripts": {
+    "typecheck": "tsgo --noEmit -p tsconfig.json",
+    "test": "bun test src"
+  }
+}

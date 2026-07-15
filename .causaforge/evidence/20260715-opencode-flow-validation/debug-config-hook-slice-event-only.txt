@@ -1,0 +1,35 @@
+{
+  "plugin": [
+    "file://<WORKTREE>/.causaforge/evidence/20260715-opencode-flow-validation/tmp-slice-event-only.mjs"
+  ],
+  "$schema": "https://opencode.ai/config.json",
+  "plugin_origins": [
+    {
+      "spec": "file://<WORKTREE>/.causaforge/evidence/20260715-opencode-flow-validation/tmp-slice-event-only.mjs",
+      "source": "/private<TEMP_PROJECT>/.opencode/opencode.json",
+      "scope": "local"
+    }
+  ],
+  "agent": {},
+  "mode": {},
+  "command": {},
+  "username": "zq"
+}
+timestamp=2026-07-15T13:36:07.969Z level=INFO run=75c29cce message="creating instance" directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:36:07.970Z level=INFO run=75c29cce message=fromDirectory directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:36:07.977Z level=INFO run=75c29cce message=bootstrapping directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:36:07.983Z level=INFO run=75c29cce message=loading path=<ISOLATED_XDG>/config/opencode/config.json
+timestamp=2026-07-15T13:36:07.984Z level=INFO run=75c29cce message=loading path=<ISOLATED_XDG>/config/opencode/opencode.json
+timestamp=2026-07-15T13:36:07.988Z level=INFO run=75c29cce message=loading path=<ISOLATED_XDG>/config/opencode/opencode.jsonc
+timestamp=2026-07-15T13:36:08.016Z level=DEBUG run=75c29cce message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.json"
+timestamp=2026-07-15T13:36:08.016Z level=INFO run=75c29cce message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.json
+timestamp=2026-07-15T13:36:08.110Z level=DEBUG run=75c29cce message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.jsonc"
+timestamp=2026-07-15T13:36:08.110Z level=INFO run=75c29cce message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.jsonc
+timestamp=2026-07-15T13:36:08.118Z level=DEBUG run=75c29cce message="loading config from /Users/zq/.opencode/opencode.json"
+timestamp=2026-07-15T13:36:08.118Z level=INFO run=75c29cce message=loading path=/Users/zq/.opencode/opencode.json
+timestamp=2026-07-15T13:36:08.118Z level=DEBUG run=75c29cce message="loading config from /Users/zq/.opencode/opencode.jsonc"
+timestamp=2026-07-15T13:36:08.118Z level=INFO run=75c29cce message=loading path=/Users/zq/.opencode/opencode.jsonc
+timestamp=2026-07-15T13:36:10.091Z level=INFO run=75c29cce message="all LSPs are disabled"
+timestamp=2026-07-15T13:36:10.092Z level=INFO run=75c29cce message="all formatters are disabled"
+timestamp=2026-07-15T13:36:10.093Z level=INFO run=75c29cce message=init
+timestamp=2026-07-15T13:36:10.095Z level=INFO run=75c29cce message="disposing instance" directory=/private<TEMP_PROJECT>

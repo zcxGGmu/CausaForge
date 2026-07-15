@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "1.0",
+  "workflowId": "wf-real-001",
+  "phase": "completed",
+  "status": "completed",
+  "entryMode": "problem-description",
+  "artifactRefs": {
+    "rootCauseArtifactId": "root-cause-001",
+    "patchPlanArtifactId": "patch-plan-001",
+    "patchCandidateArtifactId": "patch-candidate-001",
+    "verificationArtifactId": "verification-001",
+    "reviewArtifactId": "review-001",
+    "deliveryArtifactId": "delivery-001"
+  },
+  "builderSessionId": "session-builder-001",
+  "reviewerSessionId": "session-reviewer-001",
+  "createdAt": "2026-07-15T00:00:00.000Z",
+  "updatedAt": "2026-07-15T00:35:00.000Z",
+  "completedAt": "2026-07-15T00:35:00.000Z"
+}

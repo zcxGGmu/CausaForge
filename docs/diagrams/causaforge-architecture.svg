@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760" role="img" aria-labelledby="title desc">
+  <title id="title">CausaForge Architecture</title>
+  <desc id="desc">Architecture showing OpenCode session, CausaForge adapter, core protocol engine, evidence store, and product repository.</desc>
+  <style>
+    text { font-family: Inter, Arial, Helvetica, sans-serif; fill: #111827; }
+    .title { font-size: 24px; font-weight: 700; }
+    .subtitle { font-size: 13px; fill: #6b7280; }
+    .layer-title { font-size: 15px; font-weight: 700; }
+    .node-title { font-size: 14px; font-weight: 700; }
+    .node-sub { font-size: 12px; fill: #6b7280; }
+    .small { font-size: 11px; fill: #6b7280; }
+    .label { font-size: 11px; fill: #374151; }
+    .gate { font-size: 11px; font-weight: 700; fill: #374151; }
+
+  </style>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9333ea"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <text x="40" y="44" class="title">CausaForge Agent Architecture</text>
+  <text x="40" y="68" class="subtitle">The adapter handles OpenCode integration; the core package owns protocol, guards, and evidence-chain rules.</text>
+  <rect x="40" y="105" width="240" height="505" rx="16" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="58" y="135" class="layer-title">Entry Layer</text>
+  <text x="58" y="155" class="subtitle">User intent and OpenCode session</text>
+  <rect x="330" y="105" width="300" height="505" rx="16" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="348" y="135" class="layer-title">Adapter Layer</text>
+  <text x="348" y="155" class="subtitle">OpenCode plugin surface</text>
+  <rect x="680" y="105" width="300" height="505" rx="16" fill="#f0fdfa" stroke="#ccfbf1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="698" y="135" class="layer-title">Core Layer</text>
+  <text x="698" y="155" class="subtitle">State machine and guards</text>
+  <rect x="1020" y="105" width="140" height="505" rx="16" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="1038" y="135" class="layer-title">Persistence</text>
+  <text x="1038" y="155" class="subtitle">Evidence and repo</text>
+  <rect x="75" y="175" width="170" height="82" rx="10" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="160.0" y="203" text-anchor="middle" class="node-title">User Task</text>
+  <text x="160.0" y="225" text-anchor="middle" class="node-sub">problem statement</text>
+  <text x="160.0" y="242" text-anchor="middle" class="node-sub">repair goal</text>
+  <rect x="75" y="330" width="170" height="82" rx="10" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="160.0" y="358" text-anchor="middle" class="node-title">OpenCode Session</text>
+  <text x="160.0" y="380" text-anchor="middle" class="node-sub">real harness</text>
+  <text x="160.0" y="397" text-anchor="middle" class="node-sub">hook / tool calls</text>
+  <rect x="365" y="150" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="480.0" y="178" text-anchor="middle" class="node-title">PluginModule</text>
+  <text x="480.0" y="200" text-anchor="middle" class="node-sub">causaforge-agent</text>
+  <text x="480.0" y="217" text-anchor="middle" class="node-sub">config / hooks / tools</text>
+  <rect x="365" y="270" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="480.0" y="298" text-anchor="middle" class="node-title">Workflow Agents</text>
+  <text x="480.0" y="320" text-anchor="middle" class="node-sub">7 scoped roles</text>
+  <text x="480.0" y="337" text-anchor="middle" class="node-sub">phase boundaries</text>
+  <rect x="365" y="390" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="480.0" y="418" text-anchor="middle" class="node-title">Workflow Tools</text>
+  <text x="480.0" y="440" text-anchor="middle" class="node-sub">8 primitives</text>
+  <text x="480.0" y="457" text-anchor="middle" class="node-sub">start / artifact / gate</text>
+  <rect x="715" y="135" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
+  <text x="830.0" y="163" text-anchor="middle" class="node-title">State Machine</text>
+  <text x="830.0" y="185" text-anchor="middle" class="node-sub">phase transition matrix</text>
+  <text x="830.0" y="202" text-anchor="middle" class="node-sub">terminal status</text>
+  <rect x="715" y="240" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
+  <text x="830.0" y="268" text-anchor="middle" class="node-title">Artifact Protocol</text>
+  <text x="830.0" y="290" text-anchor="middle" class="node-sub">Zod schemas</text>
+  <text x="830.0" y="307" text-anchor="middle" class="node-sub">artifact chain</text>
+  <rect x="715" y="345" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
+  <text x="830.0" y="373" text-anchor="middle" class="node-title">Permission Model</text>
+  <text x="830.0" y="395" text-anchor="middle" class="node-sub">agent x phase</text>
+  <text x="830.0" y="412" text-anchor="middle" class="node-sub">approved paths</text>
+  <rect x="715" y="450" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
+  <text x="830.0" y="478" text-anchor="middle" class="node-title">Transition Gates</text>
+  <text x="830.0" y="500" text-anchor="middle" class="node-sub">real file reads</text>
+  <text x="830.0" y="517" text-anchor="middle" class="node-sub">fail-closed</text>
+  <rect x="1038" y="165" width="104" height="76" rx="10" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="1090.0" y="193" text-anchor="middle" class="node-title">.causaforge</text>
+  <text x="1090.0" y="215" text-anchor="middle" class="node-sub">workflow.json</text>
+  <text x="1090.0" y="232" text-anchor="middle" class="node-sub">evidence</text>
+  <rect x="1038" y="325" width="104" height="76" rx="10" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="1090.0" y="353" text-anchor="middle" class="node-title">Repo</text>
+  <text x="1090.0" y="375" text-anchor="middle" class="node-sub">source files</text>
+  <text x="1090.0" y="392" text-anchor="middle" class="node-sub">git diff</text>
+  <rect x="1038" y="485" width="104" height="76" rx="10" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="1090.0" y="513" text-anchor="middle" class="node-title">Package</text>
+  <text x="1090.0" y="535" text-anchor="middle" class="node-sub">review</text>
+  <text x="1090.0" y="552" text-anchor="middle" class="node-sub">delivery</text>
+  <path d="M 245,216 L 330,216 L 365,191" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <rect x="264.5" y="190" width="77.0" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="303" y="204" text-anchor="middle" class="label">task input</text>
+  <path d="M 245,371 L 330,371 L 365,431" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <rect x="265.5" y="346" width="77.0" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="304" y="360" text-anchor="middle" class="label">tool calls</text>
+  <path d="M 595,191 L 650,191 L 715,173" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <rect x="625.0" y="162" width="58" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="654" y="176" text-anchor="middle" class="label">compose</text>
+  <path d="M 595,311 L 650,311 L 715,278" fill="none" stroke="#9333ea" stroke-width="2" marker-end="url(#arrow-purple)"/>
+  <rect x="601.5" y="282" width="103.0" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="653" y="296" text-anchor="middle" class="label">write artifact</text>
+  <path d="M 595,431 L 650,431 L 715,383" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <rect x="617.8" y="404" width="70.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="653" y="418" text-anchor="middle" class="label">authorize</text>
+  <path d="M 830,211 L 830,240" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
+  <path d="M 830,316 L 830,345" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
+  <path d="M 830,421 L 830,450" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
+  <path d="M 945,278 L 1005,278 L 1038,203" fill="none" stroke="#16a34a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-green)"/>
+  <rect x="971.0" y="246" width="58" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1000" y="260" text-anchor="middle" class="label">persist</text>
+  <path d="M 945,383 L 1000,383 L 1038,363" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <rect x="958.2" y="360" width="83.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1000" y="374" text-anchor="middle" class="label">verify path</text>
+  <path d="M 945,488 L 1000,488 L 1038,523" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <rect x="958.2" y="467" width="83.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1000" y="481" text-anchor="middle" class="label">gate output</text>
+  <path d="M 1090,325 L 1090,241" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <rect x="1078.8" y="268" width="96.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1127" y="282" text-anchor="middle" class="label">read evidence</text>
+  <g transform="translate(45,650)">
+    <rect x="0" y="0" width="570" height="70" rx="10" fill="#ffffff" stroke="#e5e7eb"/>
+    <line x1="18" y1="26" x2="52" y2="26" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+    <text x="60" y="31" class="small">Main flow</text>
+    <line x1="150" y1="26" x2="184" y2="26" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+    <text x="192" y="31" class="small">Control</text>
+    <line x1="282" y1="26" x2="316" y2="26" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+    <text x="324" y="31" class="small">Evidence I/O</text>
+    <line x1="414" y1="26" x2="448" y2="26" stroke="#9333ea" stroke-width="2" marker-end="url(#arrow-purple)"/>
+    <text x="456" y="31" class="small">Artifact API</text>
+    <text x="18" y="55" class="small">Design rule: adapters are replaceable; the protocol core stays stable and evidence-driven.</text>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+case	exit_code	timed_out	live_db_before	live_db_after	output_file
+server-empty	0	False	280	280	debug-config-hook-slice-server-empty.txt
+config-only	0	False	280	280	debug-config-hook-slice-config-only.txt
+tool-only	0	False	280	280	debug-config-hook-slice-tool-only.txt
+config-tool	0	False	280	280	debug-config-hook-slice-config-tool.txt
+event-only	0	False	280	280	debug-config-hook-slice-event-only.txt
+before-only	0	False	280	280	debug-config-hook-slice-before-only.txt
+compact-only	0	False	280	280	debug-config-hook-slice-compact-only.txt
+all-via-wrapper	0	False	280	280	debug-config-hook-slice-all-via-wrapper.txt

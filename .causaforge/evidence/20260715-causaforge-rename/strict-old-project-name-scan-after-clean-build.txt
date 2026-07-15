@@ -1,0 +1,2 @@
+## old project content scan after clean build
+## old project path scan after clean build

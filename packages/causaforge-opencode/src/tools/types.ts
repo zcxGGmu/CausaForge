@@ -1,0 +1,131 @@
+import type {
+  ArtifactKind,
+  TransitionRequest,
+  WorkflowAgentId,
+  WorkflowArtifactChain,
+  WorkflowArtifactStore,
+  WorkflowPhase,
+  WorkflowState,
+} from "@causaforge/core"
+import type { WorkflowOpenCodeConfig } from "../config/schema"
+
+export interface WorkflowGitResult {
+  exitCode: number
+  stdout: string
+  stderr: string
+}
+
+export interface WorkflowGitRunner {
+  run(args: string[]): Promise<WorkflowGitResult>
+}
+
+export interface WorkflowToolDeps {
+  cwd: string
+  config: WorkflowOpenCodeConfig
+  store: WorkflowArtifactStore
+  git: WorkflowGitRunner
+}
+
+export interface WorkflowTool<Input, Output> {
+  name: WorkflowToolName
+  description: string
+  execute(input: Input): Promise<Output>
+}
+
+export type WorkflowToolName =
+  | "workflow_start"
+  | "workflow_status"
+  | "workflow_record_artifact"
+  | "workflow_validate_artifact"
+  | "workflow_capture_diff"
+  | "workflow_transition"
+  | "workflow_return_to_phase"
+  | "workflow_complete"
+
+export interface WorkflowStartInput {
+  workflowId: string
+  entryMode: "problem-description" | "root-cause-import"
+  rootCauseArtifactId?: string
+  now?: string
+}
+
+export interface WorkflowStatusInput {
+  workflowId: string
+}
+
+export interface WorkflowStatusOutput {
+  workflowId: string
+  phase: WorkflowPhase
+  status: WorkflowState["status"]
+  missing: ArtifactKind[]
+}
+
+export interface WorkflowRecordArtifactInput {
+  workflowId: string
+  agentId: WorkflowAgentId
+  artifactKind: ArtifactKind
+  artifact: unknown
+}
+
+export interface WorkflowRecordArtifactOutput {
+  artifactPath: string
+  markdownPath: string | null
+}
+
+export interface WorkflowValidateArtifactInput {
+  artifactKind: ArtifactKind
+  artifact: unknown
+}
+
+export type WorkflowValidateArtifactOutput =
+  | { ok: true; artifactId: string; workflowId: string }
+  | { ok: false; error: string }
+
+export interface WorkflowCaptureDiffInput {
+  workflowId: string
+}
+
+export interface WorkflowCaptureDiffOutput {
+  patchPath: string
+  changedFiles: string[]
+}
+
+export interface WorkflowTransitionInput extends Omit<TransitionRequest, "workflowId"> {
+  workflowId: string
+  artifacts?: WorkflowArtifactChain
+  allowPlanDeviation?: boolean
+  implementationPatchContent?: string
+  deliveryPatchContent?: string
+  now?: string
+}
+
+export type WorkflowTransitionOutput = WorkflowState
+
+export interface WorkflowReturnToPhaseInput {
+  workflowId: string
+  targetPhase: WorkflowPhase
+  requestedByAgent: WorkflowAgentId
+  sessionId: string
+  now?: string
+}
+
+export interface WorkflowCompleteInput {
+  workflowId: string
+  requestedByAgent: WorkflowAgentId
+  sessionId: string
+  artifacts?: WorkflowArtifactChain
+  implementationPatchContent?: string
+  deliveryPatchContent?: string
+  now?: string
+}
+
+export interface WorkflowTools {
+  workflow_start: WorkflowTool<WorkflowStartInput, WorkflowState>
+  workflow_status: WorkflowTool<WorkflowStatusInput, WorkflowStatusOutput>
+  workflow_record_artifact: WorkflowTool<WorkflowRecordArtifactInput, WorkflowRecordArtifactOutput>
+  workflow_validate_artifact: WorkflowTool<WorkflowValidateArtifactInput, WorkflowValidateArtifactOutput>
+  workflow_capture_diff: WorkflowTool<WorkflowCaptureDiffInput, WorkflowCaptureDiffOutput>
+  workflow_transition: WorkflowTool<WorkflowTransitionInput, WorkflowTransitionOutput>
+  workflow_return_to_phase: WorkflowTool<WorkflowReturnToPhaseInput, WorkflowTransitionOutput>
+  workflow_complete: WorkflowTool<WorkflowCompleteInput, WorkflowTransitionOutput>
+}

@@ -1,0 +1,6 @@
+timestamp=2026-07-15T13:25:51.952Z level=INFO run=e3de6598 message="creating instance" directory=<causaforge-worktree>
+timestamp=2026-07-15T13:25:51.953Z level=INFO run=e3de6598 message=fromDirectory directory=<causaforge-worktree>
+timestamp=2026-07-15T13:25:52.046Z level=INFO run=e3de6598 message=bootstrapping directory=<causaforge-worktree>
+timestamp=2026-07-15T13:25:52.050Z level=INFO run=e3de6598 message=loading path=/var/folders/w0/kv_hbdx54fz_d8c55qtlk0h00000gn/T/causaforge-opencode-xdg-b0z0qkvc/config/opencode/config.json
+timestamp=2026-07-15T13:25:52.051Z level=INFO run=e3de6598 message=loading path=/var/folders/w0/kv_hbdx54fz_d8c55qtlk0h00000gn/T/causaforge-opencode-xdg-b0z0qkvc/config/opencode/opencode.json
+timestamp=2026-07-15T13:25:52.056Z level=INFO run=e3de6598 message=loading path=/var/folders/w0/kv_hbdx54fz_d8c55qtlk0h00000gn/T/causaforge-opencode-xdg-b0z0qkvc/config/opencode/opencode.jsonc

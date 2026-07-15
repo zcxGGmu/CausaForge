@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "declarationDir": "dist",
+    "outDir": "dist",
+    "strict": true,
+    "allowArbitraryExtensions": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "lib": ["ESNext"],
+    "types": ["bun-types"]
+  },
+  "include": [
+    "packages/causaforge-core/src/**/*",
+    "packages/causaforge-opencode/src/**/*"
+  ],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}

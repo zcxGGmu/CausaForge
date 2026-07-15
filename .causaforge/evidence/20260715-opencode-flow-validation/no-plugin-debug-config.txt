@@ -1,0 +1,18 @@
+case=empty-config
+status=0
+timed_out=False
+elapsed_seconds=0.91
+stdout_bytes=133
+stderr_bytes=1593
+stdout_head={\n  "$schema": "https://opencode.ai/config.json",\n  "agent": {},\n  "mode": {},\n  "plugin": [],\n  "command": {},\n  "username": "zq"\n}\n
+stderr_head=timestamp=2026-07-15T13:27:10.525Z level=INFO run=52342f6b message="creating instance" directory=<causaforge-worktree>\ntimestamp=2026-07-15T13:27:10.529Z level=INFO run=52342f6b message=fromDirectory directory=<causaforge-worktree>\ntimestamp=2026-07-15T13:27:10.649Z level=INFO run=52342f6b message=bootstrapping directory=/Users/zq/Desktop/ai-projs/po
+---
+case=pure-empty-config
+status=0
+timed_out=False
+elapsed_seconds=0.88
+stdout_bytes=133
+stderr_bytes=1608
+stdout_head={\n  "$schema": "https://opencode.ai/config.json",\n  "agent": {},\n  "mode": {},\n  "plugin": [],\n  "command": {},\n  "username": "zq"\n}\n
+stderr_head=timestamp=2026-07-15T13:27:11.286Z level=INFO run=0dcc3eb3 message="creating instance" directory=<causaforge-worktree>\ntimestamp=2026-07-15T13:27:11.289Z level=INFO run=0dcc3eb3 message=fromDirectory directory=<causaforge-worktree>\ntimestamp=2026-07-15T13:27:11.415Z level=INFO run=0dcc3eb3 message=bootstrapping directory=/Users/zq/Desktop/ai-projs/po
+---

@@ -1,0 +1,22 @@
+timestamp=2026-07-15T14:25:54.703Z level=INFO run=bd09fcd4 message=loading path=<ISOLATED_XDG>/config/opencode/config.json
+timestamp=2026-07-15T14:25:54.712Z level=INFO run=bd09fcd4 message=loading path=<ISOLATED_XDG>/config/opencode/opencode.json
+timestamp=2026-07-15T14:25:54.761Z level=INFO run=bd09fcd4 message=loading path=<ISOLATED_XDG>/config/opencode/opencode.jsonc
+opencode server listening on http://127.0.0.1:4096
+timestamp=2026-07-15T14:25:55.463Z level=INFO run=bd09fcd4 message="creating instance" directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T14:25:55.465Z level=INFO run=bd09fcd4 message=fromDirectory directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T14:25:55.520Z level=INFO run=bd09fcd4 message=bootstrapping directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T14:25:55.545Z level=INFO run=bd09fcd4 message=loading path=<ISOLATED_XDG>/config/opencode/config.json
+timestamp=2026-07-15T14:25:55.546Z level=INFO run=bd09fcd4 message=loading path=<ISOLATED_XDG>/config/opencode/opencode.json
+timestamp=2026-07-15T14:25:55.548Z level=INFO run=bd09fcd4 message=loading path=<ISOLATED_XDG>/config/opencode/opencode.jsonc
+timestamp=2026-07-15T14:25:56.146Z level=DEBUG run=bd09fcd4 message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.json"
+timestamp=2026-07-15T14:25:56.146Z level=INFO run=bd09fcd4 message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.json
+timestamp=2026-07-15T14:25:56.185Z level=DEBUG run=bd09fcd4 message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.jsonc"
+timestamp=2026-07-15T14:25:56.185Z level=INFO run=bd09fcd4 message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.jsonc
+timestamp=2026-07-15T14:25:56.289Z level=DEBUG run=bd09fcd4 message="loading config from /Users/zq/.opencode/opencode.json"
+timestamp=2026-07-15T14:25:56.290Z level=INFO run=bd09fcd4 message=loading path=/Users/zq/.opencode/opencode.json
+timestamp=2026-07-15T14:25:56.292Z level=DEBUG run=bd09fcd4 message="loading config from /Users/zq/.opencode/opencode.jsonc"
+timestamp=2026-07-15T14:25:56.292Z level=INFO run=bd09fcd4 message=loading path=/Users/zq/.opencode/opencode.jsonc
+timestamp=2026-07-15T14:26:28.323Z level=INFO run=bd09fcd4 message="all LSPs are disabled"
+timestamp=2026-07-15T14:26:28.325Z level=INFO run=bd09fcd4 message="all formatters are disabled"
+timestamp=2026-07-15T14:26:28.325Z level=INFO run=bd09fcd4 message=init
+timestamp=2026-07-15T14:26:28.394Z level=INFO run=bd09fcd4 message="shell tool using shell" shell=/bin/zsh

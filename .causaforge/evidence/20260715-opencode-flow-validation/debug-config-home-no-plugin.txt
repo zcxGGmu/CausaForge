@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {},
+  "mode": {},
+  "plugin": [],
+  "command": {},
+  "username": "zq"
+}
+timestamp=2026-07-15T13:43:26.718Z level=INFO run=47acadff message="creating instance" directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:43:26.719Z level=INFO run=47acadff message=fromDirectory directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:43:26.733Z level=INFO run=47acadff message=bootstrapping directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:43:26.740Z level=INFO run=47acadff message=loading path=<ISOLATED_HOME_XDG>/config/opencode/config.json
+timestamp=2026-07-15T13:43:26.757Z level=INFO run=47acadff message=loading path=<ISOLATED_HOME_XDG>/config/opencode/opencode.json
+timestamp=2026-07-15T13:43:26.760Z level=INFO run=47acadff message=loading path=<ISOLATED_HOME_XDG>/config/opencode/opencode.jsonc
+timestamp=2026-07-15T13:43:26.868Z level=DEBUG run=47acadff message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.json"
+timestamp=2026-07-15T13:43:26.868Z level=INFO run=47acadff message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.json
+timestamp=2026-07-15T13:43:26.874Z level=DEBUG run=47acadff message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.jsonc"
+timestamp=2026-07-15T13:43:26.879Z level=INFO run=47acadff message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.jsonc
+timestamp=2026-07-15T13:43:26.924Z level=INFO run=47acadff message="all LSPs are disabled"
+timestamp=2026-07-15T13:43:26.925Z level=INFO run=47acadff message="all formatters are disabled"
+timestamp=2026-07-15T13:43:26.925Z level=INFO run=47acadff message=init
+timestamp=2026-07-15T13:43:26.926Z level=INFO run=47acadff message="disposing instance" directory=/private<TEMP_PROJECT>
+
+PY_EXIT_CODE=0

@@ -1,0 +1,5 @@
+case	exit_code	timed_out	live_db_before	live_db_after	output_file
+package-root-path	0	False	280	280	debug-config-spec-variants-package-root-path.txt
+package-root-file-url	0	False	280	280	debug-config-spec-variants-package-root-file-url.txt
+dist-index-file-url	0	False	280	280	debug-config-spec-variants-dist-index-file-url.txt
+shim-file-url	0	False	280	280	debug-config-spec-variants-shim-file-url.txt

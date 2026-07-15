@@ -1,0 +1,71 @@
+{
+  "plugin": [
+    "file://<WORKTREE>/.causaforge/evidence/20260715-opencode-flow-validation/tmp-seven-with-tools.mjs"
+  ],
+  "$schema": "https://opencode.ai/config.json",
+  "plugin_origins": [
+    {
+      "spec": "file://<WORKTREE>/.causaforge/evidence/20260715-opencode-flow-validation/tmp-seven-with-tools.mjs",
+      "source": "/private<TEMP_PROJECT>/.opencode/opencode.json",
+      "scope": "local"
+    }
+  ],
+  "agent": {
+    "workflow-orchestrator": {
+      "description": "d",
+      "mode": "primary",
+      "prompt": "p"
+    },
+    "root-cause-analyst": {
+      "description": "d",
+      "mode": "subagent",
+      "prompt": "p"
+    },
+    "patch-planner": {
+      "description": "d",
+      "mode": "subagent",
+      "prompt": "p"
+    },
+    "patch-builder": {
+      "description": "d",
+      "mode": "subagent",
+      "prompt": "p"
+    },
+    "regression-verifier": {
+      "description": "d",
+      "mode": "subagent",
+      "prompt": "p"
+    },
+    "patch-reviewer": {
+      "description": "d",
+      "mode": "subagent",
+      "prompt": "p"
+    },
+    "delivery-coordinator": {
+      "description": "d",
+      "mode": "subagent",
+      "prompt": "p"
+    }
+  },
+  "mode": {},
+  "command": {},
+  "username": "zq"
+}
+timestamp=2026-07-15T13:34:55.620Z level=INFO run=d4d9c285 message="creating instance" directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:34:55.621Z level=INFO run=d4d9c285 message=fromDirectory directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:34:55.636Z level=INFO run=d4d9c285 message=bootstrapping directory=/private<TEMP_PROJECT>
+timestamp=2026-07-15T13:34:55.641Z level=INFO run=d4d9c285 message=loading path=<ISOLATED_XDG>/config/opencode/config.json
+timestamp=2026-07-15T13:34:55.642Z level=INFO run=d4d9c285 message=loading path=<ISOLATED_XDG>/config/opencode/opencode.json
+timestamp=2026-07-15T13:34:55.646Z level=INFO run=d4d9c285 message=loading path=<ISOLATED_XDG>/config/opencode/opencode.jsonc
+timestamp=2026-07-15T13:34:55.768Z level=DEBUG run=d4d9c285 message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.json"
+timestamp=2026-07-15T13:34:55.768Z level=INFO run=d4d9c285 message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.json
+timestamp=2026-07-15T13:34:55.777Z level=DEBUG run=d4d9c285 message="loading config from /private<TEMP_PROJECT>/.opencode/opencode.jsonc"
+timestamp=2026-07-15T13:34:55.777Z level=INFO run=d4d9c285 message=loading path=/private<TEMP_PROJECT>/.opencode/opencode.jsonc
+timestamp=2026-07-15T13:34:55.784Z level=DEBUG run=d4d9c285 message="loading config from /Users/zq/.opencode/opencode.json"
+timestamp=2026-07-15T13:34:55.785Z level=INFO run=d4d9c285 message=loading path=/Users/zq/.opencode/opencode.json
+timestamp=2026-07-15T13:34:55.785Z level=DEBUG run=d4d9c285 message="loading config from /Users/zq/.opencode/opencode.jsonc"
+timestamp=2026-07-15T13:34:55.785Z level=INFO run=d4d9c285 message=loading path=/Users/zq/.opencode/opencode.jsonc
+timestamp=2026-07-15T13:34:59.245Z level=INFO run=d4d9c285 message="all LSPs are disabled"
+timestamp=2026-07-15T13:34:59.246Z level=INFO run=d4d9c285 message="all formatters are disabled"
+timestamp=2026-07-15T13:34:59.246Z level=INFO run=d4d9c285 message=init
+timestamp=2026-07-15T13:34:59.248Z level=INFO run=d4d9c285 message="disposing instance" directory=/private<TEMP_PROJECT>

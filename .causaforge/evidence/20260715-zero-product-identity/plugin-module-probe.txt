@@ -1,0 +1,5 @@
+plugin id: causaforge-agent
+hooks: config, event, experimental.compaction.autocontinue, experimental.session.compacting, tool, tool.execute.before
+tools: workflow_capture_diff, workflow_complete, workflow_record_artifact, workflow_return_to_phase, workflow_start, workflow_status, workflow_transition, workflow_validate_artifact
+agents: delivery-coordinator, patch-builder, patch-planner, patch-reviewer, regression-verifier, root-cause-analyst, workflow-orchestrator
+production module probe: PASS
