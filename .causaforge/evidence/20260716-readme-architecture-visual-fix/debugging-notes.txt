@@ -1,0 +1,3 @@
+Symptom: first README architecture diagram has text overlapping chart nodes.
+Observed: Adapter/Core layer subtitles are too close to top nodes; Core Layer header collides with State Machine node.
+Root cause: SVG top node y positions start inside the layer header area. Previous QA only checked links and renderability, not visual non-overlap.

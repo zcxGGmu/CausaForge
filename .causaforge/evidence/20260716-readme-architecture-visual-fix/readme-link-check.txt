@@ -1,0 +1,11 @@
+OK ./LICENSE.md
+OK ./package.json
+OK ./packages/causaforge-opencode/src/opencode-plugin-module.ts
+OK ./packages/causaforge-core/src/phases.ts
+OK ./docs/diagrams/causaforge-architecture.png
+OK ./docs/diagrams/causaforge-workflow.png
+OK ./docs/diagrams/causaforge-workflow.svg
+OK ./docs/diagrams/causaforge-architecture.png
+OK ./docs/diagrams/causaforge-architecture.svg
+OK ./ROADMAP.md
+OK ./LICENSE.md

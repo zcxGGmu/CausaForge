@@ -1,0 +1,3 @@
+SVG XML valid
+PNG size: 2400x1520
+PNG render exists and is readable

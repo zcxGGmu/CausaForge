@@ -39,6 +39,22 @@
 - 文档事实来自当前项目源码和元数据：`package.json`、`ROADMAP.md`、core phase/guard/artifact store、OpenCode agent/tool/hook surface。
 - 验证证据写入 `.causaforge/evidence/20260715-readme-optimization/`：README 链接、package fact check、claim scan、旧标识扫描、89 个测试、typecheck、build 和 diff check。
 
+## Stage 10：README 架构图视觉重叠修复
+
+- [x] 复现 README 第一张架构图文字与节点重叠问题，并保存修复前图像证据
+- [x] 定位 SVG 布局根因：顶部节点侵入 layer header / subtitle 区域
+- [x] 调整架构图 SVG 节点、箭头和标签坐标，重新渲染 PNG
+- [x] 人工查看修复后 PNG，确认标题、说明、节点和连线标签不再重叠
+- [x] 记录 README 视觉 QA 教训，运行图像/文档验证和 diff check
+- [x] 写入 `.causaforge/evidence/20260716-readme-architecture-visual-fix/` 证据并创建中文阶段提交
+
+### Stage 10 Review
+
+- 已确认 README 第一张架构图原问题：Adapter/Core layer 说明与顶部节点视觉重叠，尤其 Core Layer 与 State Machine 区域。
+- 根因是 SVG 顶部节点 y 坐标过高，侵入 layer header/subtitle 区域；旧 QA 只验证渲染成功，没有人工视觉检查。
+- 已将 Adapter/Core 节点下移并同步调整箭头与标签，重新渲染 `docs/diagrams/causaforge-architecture.png`。
+- 已把 README 图示视觉检查要求补充进 `tasks/lessons.md`，并保存 before/after PNG、手工视觉检查、SVG/XML、链接、扫描、测试、typecheck、build 和 diff check 证据。
+
 ## Stage 5：真实 OpenCode 工作流验证
 
 - [x] 复现并定位 `opencode debug config` 加载当前插件超时问题

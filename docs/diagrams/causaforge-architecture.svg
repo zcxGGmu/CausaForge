@@ -53,34 +53,34 @@
   <text x="160.0" y="358" text-anchor="middle" class="node-title">OpenCode Session</text>
   <text x="160.0" y="380" text-anchor="middle" class="node-sub">real harness</text>
   <text x="160.0" y="397" text-anchor="middle" class="node-sub">hook / tool calls</text>
-  <rect x="365" y="150" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
-  <text x="480.0" y="178" text-anchor="middle" class="node-title">PluginModule</text>
-  <text x="480.0" y="200" text-anchor="middle" class="node-sub">causaforge-agent</text>
-  <text x="480.0" y="217" text-anchor="middle" class="node-sub">config / hooks / tools</text>
-  <rect x="365" y="270" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
-  <text x="480.0" y="298" text-anchor="middle" class="node-title">Workflow Agents</text>
-  <text x="480.0" y="320" text-anchor="middle" class="node-sub">7 scoped roles</text>
-  <text x="480.0" y="337" text-anchor="middle" class="node-sub">phase boundaries</text>
-  <rect x="365" y="390" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
-  <text x="480.0" y="418" text-anchor="middle" class="node-title">Workflow Tools</text>
-  <text x="480.0" y="440" text-anchor="middle" class="node-sub">8 primitives</text>
-  <text x="480.0" y="457" text-anchor="middle" class="node-sub">start / artifact / gate</text>
-  <rect x="715" y="135" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
-  <text x="830.0" y="163" text-anchor="middle" class="node-title">State Machine</text>
-  <text x="830.0" y="185" text-anchor="middle" class="node-sub">phase transition matrix</text>
-  <text x="830.0" y="202" text-anchor="middle" class="node-sub">terminal status</text>
-  <rect x="715" y="240" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
-  <text x="830.0" y="268" text-anchor="middle" class="node-title">Artifact Protocol</text>
-  <text x="830.0" y="290" text-anchor="middle" class="node-sub">Zod schemas</text>
-  <text x="830.0" y="307" text-anchor="middle" class="node-sub">artifact chain</text>
-  <rect x="715" y="345" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
-  <text x="830.0" y="373" text-anchor="middle" class="node-title">Permission Model</text>
-  <text x="830.0" y="395" text-anchor="middle" class="node-sub">agent x phase</text>
-  <text x="830.0" y="412" text-anchor="middle" class="node-sub">approved paths</text>
-  <rect x="715" y="450" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
-  <text x="830.0" y="478" text-anchor="middle" class="node-title">Transition Gates</text>
-  <text x="830.0" y="500" text-anchor="middle" class="node-sub">real file reads</text>
-  <text x="830.0" y="517" text-anchor="middle" class="node-sub">fail-closed</text>
+  <rect x="365" y="185" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="480.0" y="213" text-anchor="middle" class="node-title">PluginModule</text>
+  <text x="480.0" y="235" text-anchor="middle" class="node-sub">causaforge-agent</text>
+  <text x="480.0" y="252" text-anchor="middle" class="node-sub">config / hooks / tools</text>
+  <rect x="365" y="330" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="480.0" y="358" text-anchor="middle" class="node-title">Workflow Agents</text>
+  <text x="480.0" y="380" text-anchor="middle" class="node-sub">7 scoped roles</text>
+  <text x="480.0" y="397" text-anchor="middle" class="node-sub">phase boundaries</text>
+  <rect x="365" y="475" width="230" height="82" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="480.0" y="503" text-anchor="middle" class="node-title">Workflow Tools</text>
+  <text x="480.0" y="525" text-anchor="middle" class="node-sub">8 primitives</text>
+  <text x="480.0" y="542" text-anchor="middle" class="node-sub">start / artifact / gate</text>
+  <rect x="715" y="185" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
+  <text x="830.0" y="213" text-anchor="middle" class="node-title">State Machine</text>
+  <text x="830.0" y="235" text-anchor="middle" class="node-sub">phase transition matrix</text>
+  <text x="830.0" y="252" text-anchor="middle" class="node-sub">terminal status</text>
+  <rect x="715" y="290" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
+  <text x="830.0" y="318" text-anchor="middle" class="node-title">Artifact Protocol</text>
+  <text x="830.0" y="340" text-anchor="middle" class="node-sub">Zod schemas</text>
+  <text x="830.0" y="357" text-anchor="middle" class="node-sub">artifact chain</text>
+  <rect x="715" y="395" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
+  <text x="830.0" y="423" text-anchor="middle" class="node-title">Permission Model</text>
+  <text x="830.0" y="445" text-anchor="middle" class="node-sub">agent x phase</text>
+  <text x="830.0" y="462" text-anchor="middle" class="node-sub">approved paths</text>
+  <rect x="715" y="500" width="230" height="76" rx="10" fill="#ffffff" stroke="#ccfbf1" stroke-width="1.5"/>
+  <text x="830.0" y="528" text-anchor="middle" class="node-title">Transition Gates</text>
+  <text x="830.0" y="550" text-anchor="middle" class="node-sub">real file reads</text>
+  <text x="830.0" y="567" text-anchor="middle" class="node-sub">fail-closed</text>
   <rect x="1038" y="165" width="104" height="76" rx="10" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5"/>
   <text x="1090.0" y="193" text-anchor="middle" class="node-title">.causaforge</text>
   <text x="1090.0" y="215" text-anchor="middle" class="node-sub">workflow.json</text>
@@ -93,33 +93,33 @@
   <text x="1090.0" y="513" text-anchor="middle" class="node-title">Package</text>
   <text x="1090.0" y="535" text-anchor="middle" class="node-sub">review</text>
   <text x="1090.0" y="552" text-anchor="middle" class="node-sub">delivery</text>
-  <path d="M 245,216 L 330,216 L 365,191" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M 245,216 L 330,216 L 365,226" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
   <rect x="264.5" y="190" width="77.0" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
   <text x="303" y="204" text-anchor="middle" class="label">task input</text>
-  <path d="M 245,371 L 330,371 L 365,431" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
-  <rect x="265.5" y="346" width="77.0" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
-  <text x="304" y="360" text-anchor="middle" class="label">tool calls</text>
-  <path d="M 595,191 L 650,191 L 715,173" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
-  <rect x="625.0" y="162" width="58" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
-  <text x="654" y="176" text-anchor="middle" class="label">compose</text>
-  <path d="M 595,311 L 650,311 L 715,278" fill="none" stroke="#9333ea" stroke-width="2" marker-end="url(#arrow-purple)"/>
-  <rect x="601.5" y="282" width="103.0" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
-  <text x="653" y="296" text-anchor="middle" class="label">write artifact</text>
-  <path d="M 595,431 L 650,431 L 715,383" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
-  <rect x="617.8" y="404" width="70.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
-  <text x="653" y="418" text-anchor="middle" class="label">authorize</text>
-  <path d="M 830,211 L 830,240" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
-  <path d="M 830,316 L 830,345" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
-  <path d="M 830,421 L 830,450" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
-  <path d="M 945,278 L 1005,278 L 1038,203" fill="none" stroke="#16a34a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-green)"/>
-  <rect x="971.0" y="246" width="58" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
-  <text x="1000" y="260" text-anchor="middle" class="label">persist</text>
-  <path d="M 945,383 L 1000,383 L 1038,363" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
-  <rect x="958.2" y="360" width="83.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
-  <text x="1000" y="374" text-anchor="middle" class="label">verify path</text>
-  <path d="M 945,488 L 1000,488 L 1038,523" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
-  <rect x="958.2" y="467" width="83.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
-  <text x="1000" y="481" text-anchor="middle" class="label">gate output</text>
+  <path d="M 245,371 L 330,371 L 365,516" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <rect x="265.5" y="382" width="77.0" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="304" y="396" text-anchor="middle" class="label">tool calls</text>
+  <path d="M 595,226 L 650,226 L 715,223" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <rect x="625.0" y="202" width="58" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="654" y="216" text-anchor="middle" class="label">compose</text>
+  <path d="M 595,371 L 650,371 L 715,328" fill="none" stroke="#9333ea" stroke-width="2" marker-end="url(#arrow-purple)"/>
+  <rect x="601.5" y="342" width="103.0" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="653" y="356" text-anchor="middle" class="label">write artifact</text>
+  <path d="M 595,516 L 650,516 L 715,433" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <rect x="617.8" y="489" width="70.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="653" y="503" text-anchor="middle" class="label">authorize</text>
+  <path d="M 830,261 L 830,290" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
+  <path d="M 830,366 L 830,395" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
+  <path d="M 830,471 L 830,500" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-gray)"/>
+  <path d="M 945,328 L 1005,328 L 1038,203" fill="none" stroke="#16a34a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-green)"/>
+  <rect x="971.0" y="296" width="58" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1000" y="310" text-anchor="middle" class="label">persist</text>
+  <path d="M 945,433 L 1000,433 L 1038,363" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <rect x="958.2" y="410" width="83.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1000" y="424" text-anchor="middle" class="label">verify path</text>
+  <path d="M 945,538 L 1000,538 L 1038,523" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <rect x="958.2" y="512" width="83.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1000" y="526" text-anchor="middle" class="label">gate output</text>
   <path d="M 1090,325 L 1090,241" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
   <rect x="1078.8" y="268" width="96.5" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
   <text x="1127" y="282" text-anchor="middle" class="label">read evidence</text>
