@@ -83,7 +83,7 @@
 - [x] 将 package repository、bugs、homepage 指向独立远程 `zcxGGmu/CausaForge`
 - [x] 运行安装、测试、类型检查、构建、严格标识扫描和 diff check
 - [x] 创建独立仓库中文初始提交
-- [ ] 推送 `main` 到远程 origin
+- [x] 推送 `main` 到远程 origin
 
 
 ### Stage 8 Review
@@ -92,3 +92,4 @@
 - 新仓库保留 CausaForge-only 结构，并将 repository、bugs、homepage 与 author 指向独立远程 owner。
 - 验证通过：`bun install --ignore-scripts`、89 个测试、typecheck、build、生产入口 probe、package metadata probe、`git diff --check` 和严格身份扫描。
 - 本阶段不保留源仓库 Git 历史，目标是形成独立仓库的干净初始提交。
+- `main` 已推送到远程 `git@github.com:zcxGGmu/CausaForge.git`，并建立 upstream 跟踪。
