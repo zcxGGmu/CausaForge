@@ -23,6 +23,22 @@
 - [ ] 为未来非 OpenCode adapter 增加独立 package 模板和独立 QA 证据规范
 - [ ] 把 evidence renderer 扩展成审查友好的 Markdown 汇总
 
+## Stage 9：README 首屏与项目叙事优化
+
+- [x] 深读当前项目事实源：README、ROADMAP、package metadata、agent/tool registry、core guard 和 evidence store
+- [x] 参考用户指定 README 的结构手法，提炼可复用的首屏、安装、Highlights 和深层说明模式
+- [x] 重写 README：突出项目定位、TL;DR、安装/本地验证、Agent 使用提示、功能矩阵、架构图、工作流门禁和目录边界
+- [x] 保持事实准确：不虚构 npm 发布状态、用户评价、社区入口、多语言文档或未实现功能
+- [x] 运行 README 链接/图片检查、旧标识扫描、测试、typecheck、build 和 diff check
+- [x] 将验证证据写入 `.causaforge/evidence/20260715-readme-optimization/` 并创建中文阶段提交
+
+### Stage 9 Review
+
+- README 已重构为 GitHub 首屏型文档：callout、居中标题、badge、架构图、TL;DR、Agent 使用提示、Highlights、工作流、Agent/Tool 表、配置说明和非目标。
+- 参考用户指定 README 的结构方法，但没有保留外部仓库品牌、用户评价、社区入口、包管理器安装器、多语言文档或未实现的多 harness 运行时声明。
+- 文档事实来自当前项目源码和元数据：`package.json`、`ROADMAP.md`、core phase/guard/artifact store、OpenCode agent/tool/hook surface。
+- 验证证据写入 `.causaforge/evidence/20260715-readme-optimization/`：README 链接、package fact check、claim scan、旧标识扫描、89 个测试、typecheck、build 和 diff check。
+
 ## Stage 5：真实 OpenCode 工作流验证
 
 - [x] 复现并定位 `opencode debug config` 加载当前插件超时问题

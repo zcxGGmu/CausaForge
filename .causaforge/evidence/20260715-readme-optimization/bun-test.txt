@@ -1,0 +1,132 @@
+$ bun test packages/causaforge-core/src packages/causaforge-opencode/src
+bun test v1.3.14 (0d9b296a)
+
+packages/causaforge-opencode/src/workflow.rollback.integration.test.ts:
+(pass) workflow rollback integration > returns from failed verification to building [19.33ms]
+(pass) workflow rollback integration > review blocking returns to building and requires a new verification pass [3.83ms]
+(pass) workflow rollback integration > rejects completion when delivery patch differs from implementation patch [4.68ms]
+(pass) workflow rollback integration > rejects completion when real patch files are missing [1.97ms]
+(pass) workflow rollback integration > rejects spoofed transition artifacts that were not recorded in the artifact store [0.92ms]
+
+packages/causaforge-opencode/src/plugin.test.ts:
+(pass) workflow OpenCode plugin adapter > assembles only the normalized workflow surface [1.49ms]
+(pass) workflow OpenCode plugin adapter > default plugin surface only exposes workflow primitives [0.53ms]
+
+packages/causaforge-opencode/src/opencode-plugin-module.test.ts:
+(pass) OpenCode plugin module hooks > uses the single active workflow for building-phase tool permission fallback [10.57ms]
+
+packages/causaforge-opencode/src/workflow.problem-entry.integration.test.ts:
+(pass) workflow problem-description entry integration > drives a complete problem-description workflow through delivery [3.77ms]
+
+packages/causaforge-opencode/src/workflow.import-entry.integration.test.ts:
+(pass) workflow root-cause-import entry integration > accepts a valid imported root cause and starts directly in planning [1.67ms]
+(pass) workflow root-cause-import entry integration > keeps root-cause import in intake when the imported report is missing or invalid [1.24ms]
+
+packages/causaforge-core/src/package-api.test.ts:
+(pass) causaforge-core package API > exposes matching runtime and type declarations from the package root [0.07ms]
+(pass) causaforge-core package API > exposes artifact schemas and inferred types from the package root [0.10ms]
+
+packages/causaforge-core/src/phases.test.ts:
+(pass) workflow constants > exposes only normalized workflow agents [0.42ms]
+(pass) workflow constants > exposes the ordered lifecycle [0.03ms]
+
+packages/causaforge-core/src/transitions.test.ts:
+(pass) workflow transitions > matches the complete allowed transition matrix [0.14ms]
+(pass) workflow transitions > keeps completed and blocked terminal [0.02ms]
+(pass) workflow transitions > allows imported root cause reports to enter planning structurally [0.01ms]
+(pass) workflow transitions > requires review failures to return through building [0.01ms]
+(pass) workflow transitions > throws a structured error for invalid transitions [0.73ms]
+(pass) workflow transitions > accepts allowed transitions without returning a value [0.01ms]
+
+packages/causaforge-core/src/permissions.test.ts:
+(pass) workflow permissions > limits product code modifications to the patch builder [0.26ms]
+(pass) workflow permissions > limits artifact writes to the owning workflow agent [0.03ms]
+
+packages/causaforge-opencode/src/tools/tools.test.ts:
+(pass) workflow tools > registers the deterministic workflow tool surface [0.52ms]
+(pass) workflow tools > starts a workflow and reports status [1.43ms]
+(pass) workflow tools > records artifacts only when the agent owns that artifact kind [1.89ms]
+(pass) workflow tools > rejects path traversal workflow IDs [0.75ms]
+(pass) workflow tools > captures git diff through the injected runner [1.12ms]
+(pass) workflow tools > return to phase rejects terminal or forward targets [0.60ms]
+(pass) workflow tools > fails capture when git fails or diff is empty [0.27ms]
+
+packages/causaforge-opencode/src/config/schema.test.ts:
+(pass) workflow OpenCode config schema > applies workflow defaults [0.05ms]
+(pass) workflow OpenCode config schema > accepts only normalized workflow agent overrides [0.57ms]
+(pass) workflow OpenCode config schema > rejects non-workflow agent configuration keys [0.07ms]
+
+packages/causaforge-opencode/src/agents/registry.test.ts:
+(pass) workflow agent registry > registers only normalized workflow agents in canonical order [0.81ms]
+(pass) workflow agent registry > includes role boundaries and workflow artifact instructions in every prompt [0.09ms]
+(pass) workflow agent registry > applies model overrides by normalized agent ID [0.08ms]
+
+packages/causaforge-opencode/src/hooks/tool-permission.test.ts:
+(pass) workflow phase context > renders only the minimal phase context fields [0.22ms]
+(pass) workflow tool permission guard > rejects unknown tools by default [0.03ms]
+(pass) workflow tool permission guard > allows the eight workflow tools without write permissions [0.04ms]
+(pass) workflow tool permission guard > allows explicit read, question, and read-only LSP tools [0.04ms]
+(pass) workflow tool permission guard > allows only the explicit read-only bash command subset [1.00ms]
+(pass) workflow tool permission guard > allows bash only for trusted workflow agent and phase pairs [0.05ms]
+(pass) workflow tool permission guard > rejects bash when trusted agent or phase is missing or mismatched [0.07ms]
+(pass) workflow tool permission guard > rejects bash writes, chaining, redirection, and non-whitelisted commands [0.27ms]
+(pass) workflow tool permission guard > rejects verifier edit attempts [0.05ms]
+(pass) workflow tool permission guard > rejects reviewer apply_patch attempts [0.02ms]
+(pass) workflow tool permission guard > allows product writes only for a trusted builder in building [0.06ms]
+(pass) workflow tool permission guard > rejects builder modifications outside the approved plan [0.05ms]
+(pass) workflow tool permission guard > rejects writes when the target or approved allowlist is missing [0.03ms]
+(pass) workflow tool permission guard > rejects direct workflow state writes [0.04ms]
+(pass) workflow tool permission guard > rejects workflow state writes after resolving parent segments [0.06ms]
+(pass) workflow tool permission guard > rejects workflow state under a custom artifact root [0.09ms]
+(pass) workflow tool permission guard > uses the default artifact root when artifactRoot is omitted [0.04ms]
+(pass) workflow tool permission guard > allows approved workflow.json files outside the canonical artifact state path [0.10ms]
+(pass) workflow tool permission guard > rejects an artifact root outside projectRoot [0.03ms]
+(pass) workflow tool permission guard > normalizes parent segments before comparing approved product paths [0.02ms]
+(pass) workflow tool permission guard > normalizes Windows separators before comparing approved product paths [0.11ms]
+(pass) workflow tool permission guard > rejects parent traversal and absolute paths outside the project [0.07ms]
+(pass) workflow tool permission guard > requires every multi_edit target to be inside the approved plan [0.11ms]
+(pass) workflow tool permission guard > allows planner reads and LSP tools [0.04ms]
+
+packages/causaforge-opencode/src/hooks/lifecycle.test.ts:
+(pass) workflow lifecycle hooks > records command results as draft evidence only [0.06ms]
+(pass) workflow lifecycle hooks > compaction snapshot stores only workflow pointer fields [0.04ms]
+(pass) workflow lifecycle hooks > compaction restore reads phase from workflow state [1.21ms]
+(pass) workflow lifecycle hooks > stop gate rejects unfinished workflows with phase and missing gates [0.06ms]
+(pass) workflow lifecycle hooks > stop gate allows completed workflows [0.01ms]
+
+packages/causaforge-core/src/artifacts/store.test.ts:
+(pass) workflow artifact store > keeps workflow paths inside the artifact root [0.44ms]
+(pass) workflow artifact store > writes workflow state and validated artifacts atomically [2.09ms]
+(pass) workflow artifact store > lists persisted workflow states for lifecycle hooks [3.01ms]
+(pass) workflow artifact store > rejects artifacts that do not match their schema [0.92ms]
+(pass) workflow artifact store > rejects artifacts whose workflow ID does not match the target workflow [0.75ms]
+
+packages/causaforge-core/src/artifacts/renderers.test.ts:
+(pass) workflow artifact markdown renderers > renders artifact IDs, status, and core summaries [0.27ms]
+(pass) workflow artifact markdown renderers > rejects invalid artifact input before rendering [0.48ms]
+
+packages/causaforge-core/src/schemas/schemas.test.ts:
+(pass) workflow artifact schemas > accepts minimal valid workflow state and six artifacts [0.24ms]
+(pass) workflow artifact schemas > rejects incomplete common fields and artifact references [1.48ms]
+(pass) workflow artifact schemas > requires passing verification evidence [0.15ms]
+(pass) workflow artifact schemas > validates verification criterion results against the root cause [0.67ms]
+(pass) workflow artifact schemas > requires approved plan deviations before verification [0.25ms]
+(pass) workflow artifact schemas > rejects passing reviews with blocking findings [0.13ms]
+(pass) workflow artifact schemas > requires every upstream artifact for complete delivery [0.71ms]
+(pass) workflow artifact schemas > accepts only explicit workflow artifact references [0.14ms]
+(pass) workflow artifact schemas > keeps workflow terminal status, phase, and timestamps consistent [0.26ms]
+
+packages/causaforge-core/src/guards/transition-guard.test.ts:
+(pass) workflow transition guard > rejects root cause to planning without a root cause artifact [0.10ms]
+(pass) workflow transition guard > rejects patch plans that reference the wrong root cause artifact [0.03ms]
+(pass) workflow transition guard > rejects modified files outside the approved plan when deviations are disabled [0.05ms]
+(pass) workflow transition guard > rejects reviewer sessions that match the builder session [0.19ms]
+(pass) workflow transition guard > rejects reviewing when verification did not pass [0.04ms]
+(pass) workflow transition guard > rejects completion when delivery patch content differs from implementation patch content [0.04ms]
+(pass) workflow transition guard > rejects completion when patch contents are missing [0.06ms]
+(pass) workflow transition guard > returns the next workflow state when completion gates pass [0.12ms]
+
+ 89 pass
+ 0 fail
+ 425 expect() calls
+Ran 89 tests across 18 files. [317.00ms]
