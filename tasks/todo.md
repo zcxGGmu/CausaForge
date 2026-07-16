@@ -23,6 +23,25 @@
 - [ ] 为未来非 OpenCode adapter 增加独立 package 模板和独立 QA 证据规范
 - [ ] 把 evidence renderer 扩展成审查友好的 Markdown 汇总
 
+## Stage 12：项目级社区贡献风格 Skill
+
+- [x] 初始化 `skills/repository-contribution-style/`，生成规范的 `SKILL.md` 与 `agents/openai.yaml`
+- [x] 定义本地贡献文档、GitHub 社区文件、提交工具链和近期合并历史的发现顺序
+- [x] 定义 commit message、PR title、PR body 和来源说明的生成契约与证据优先级
+- [x] 加入缺少 GitHub CLI、私有仓库权限、模板缺失和规则冲突时的停止与降级条件
+- [x] 运行 frontmatter 校验，以及正向触发、负向触发和完整流程场景测试
+- [x] 运行全量测试、typecheck、build、严格标识扫描和 `git diff --check`
+- [x] 将验证证据写入 `.causaforge/evidence/20260716-repository-contribution-style-skill/` 并创建中文阶段提交
+
+### Stage 12 Review
+
+- 新增项目级 `repository-contribution-style` Skill，可根据目标仓库的贡献指南、PR 模板、commit/release 配置和近期维护者实践生成 commit 与 PR 文案。
+- 工作流会先绑定目标仓库与 artifact-specific diff scope；commit 默认读取 staged diff，PR 使用目标 remote-qualified base 或已验证 base SHA，避免混入无关 checkout/工作区改动。
+- GitHub ref、path、模板和 PR 内容统一视为不可信数据，动态值采用结构化参数或 URI 编码，不执行仓库内容中的命令、凭据请求或提示覆盖指令。
+- 场景测试覆盖 3 个正向触发、2 个负向触发、CausaForge 真实流程、Kubernetes 模板抓取、7 类变更发现/降级路径、多模板冲突和恶意 ref/path/prompt injection。
+- 独立审查发现的命令注入、目标绑定、diff scope、优先级和历史样本过滤问题均已修复；最终复审无 findings。
+- 验证证据写入 `.causaforge/evidence/20260716-repository-contribution-style-skill/`：skill validator、89 个测试、typecheck、build、占位符/旧标识扫描、diff check、场景测试和最终审查均通过。
+
 ## Stage 9：README 首屏与项目叙事优化
 
 - [x] 深读当前项目事实源：README、ROADMAP、package metadata、agent/tool registry、core guard 和 evidence store

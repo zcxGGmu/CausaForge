@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repository Contribution Style"
+  short_description: "Draft repository-specific commits and pull requests"
+  default_prompt: "Use $repository-contribution-style to draft a commit message and pull request that follow the target repository contribution rules."
