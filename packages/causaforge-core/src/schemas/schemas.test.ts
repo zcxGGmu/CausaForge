@@ -5,8 +5,10 @@ import {
   PatchPlanArtifactSchema,
   ReviewArtifactSchema,
   RootCauseArtifactSchema,
+  TestSuiteManifestSchema,
   validateVerificationAgainstRootCause,
   VerificationArtifactSchema,
+  VerificationRunArtifactSchema,
   WorkflowStateSchema,
 } from "./index"
 
@@ -89,6 +91,44 @@ const verification = {
   status: "pass" as const,
 }
 
+const testSuiteManifest = {
+  suiteId: "migration-suite",
+  source: "user" as const,
+  runnerId: "local",
+  commands: [
+    {
+      commandId: "migration-tests",
+      argv: ["bun", "test", "src/migrate.test.ts"],
+      required: true,
+      timeoutSeconds: 300,
+    },
+  ],
+}
+
+const verificationRun = {
+  ...base,
+  artifactId: "verification-run-001",
+  iteration: 1,
+  patchCandidateArtifactId: patchCandidate.artifactId,
+  runner: { runnerId: "local", type: "local" as const, target: "local project checkout" },
+  manifest: testSuiteManifest,
+  commands: [
+    {
+      commandId: "migration-tests",
+      argv: ["bun", "test", "src/migrate.test.ts"],
+      required: true,
+      exitCode: 0,
+      status: "pass" as const,
+      startedAt: base.createdAt,
+      completedAt: base.createdAt,
+      stdoutPath: "iterations/0001/logs/migration-tests.stdout.txt",
+      stderrPath: "iterations/0001/logs/migration-tests.stderr.txt",
+    },
+  ],
+  failureSignature: null,
+  status: "pass" as const,
+}
+
 const review = {
   ...base,
   artifactId: "review-001",
@@ -140,6 +180,8 @@ describe("workflow artifact schemas", () => {
     expect(PatchPlanArtifactSchema.safeParse(patchPlan).success).toBe(true)
     expect(PatchCandidateArtifactSchema.safeParse(patchCandidate).success).toBe(true)
     expect(VerificationArtifactSchema.safeParse(verification).success).toBe(true)
+    expect(TestSuiteManifestSchema.safeParse(testSuiteManifest).success).toBe(true)
+    expect(VerificationRunArtifactSchema.safeParse(verificationRun).success).toBe(true)
     expect(ReviewArtifactSchema.safeParse(review).success).toBe(true)
     expect(DeliveryArtifactSchema.safeParse(delivery).success).toBe(true)
   })
@@ -168,6 +210,29 @@ describe("workflow artifact schemas", () => {
       VerificationArtifactSchema.safeParse({
         ...verification,
         commands: [{ ...verification.commands[0], exitCode: 1 }],
+      }).success,
+    ).toBe(false)
+  })
+
+  test("requires passing verification runs to have successful required commands", () => {
+    expect(
+      VerificationRunArtifactSchema.safeParse({
+        ...verificationRun,
+        commands: [{ ...verificationRun.commands[0], exitCode: 1, status: "fail" }],
+      }).success,
+    ).toBe(false)
+
+    expect(
+      VerificationRunArtifactSchema.safeParse({
+        ...verificationRun,
+        manifest: { ...testSuiteManifest, commands: [] },
+      }).success,
+    ).toBe(false)
+
+    expect(
+      TestSuiteManifestSchema.safeParse({
+        ...testSuiteManifest,
+        commands: [{ ...testSuiteManifest.commands[0], argv: [] }],
       }).success,
     ).toBe(false)
   })

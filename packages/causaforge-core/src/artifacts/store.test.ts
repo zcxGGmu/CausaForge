@@ -2,7 +2,13 @@ import fs from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
 import { describe, expect, test } from "bun:test"
-import { createWorkflowArtifactStore, getArtifactPath, getWorkflowDir } from "./index"
+import {
+  createWorkflowArtifactStore,
+  getArtifactPath,
+  getLatestVerificationRunPath,
+  getVerificationRunPath,
+  getWorkflowDir,
+} from "./index"
 
 const timestamp = "2026-07-13T00:00:00.000Z"
 
@@ -39,6 +45,44 @@ const rootCause = {
   status: "confirmed" as const,
 }
 
+const verificationRun = {
+  schemaVersion: "1.0" as const,
+  workflowId: "wf-001",
+  artifactId: "verification-run-001",
+  createdAt: timestamp,
+  iteration: 1,
+  patchCandidateArtifactId: "patch-candidate-001",
+  runner: { runnerId: "local", type: "local" as const, target: "local project checkout" },
+  manifest: {
+    suiteId: "migration-suite",
+    source: "user" as const,
+    runnerId: "local",
+    commands: [
+      {
+        commandId: "migration-tests",
+        argv: ["bun", "test", "src/migrate.test.ts"],
+        required: true,
+        timeoutSeconds: 300,
+      },
+    ],
+  },
+  commands: [
+    {
+      commandId: "migration-tests",
+      argv: ["bun", "test", "src/migrate.test.ts"],
+      required: true,
+      exitCode: 1,
+      status: "fail" as const,
+      startedAt: timestamp,
+      completedAt: timestamp,
+      stdoutPath: "iterations/0001/logs/migration-tests.stdout.txt",
+      stderrPath: "iterations/0001/logs/migration-tests.stderr.txt",
+    },
+  ],
+  failureSignature: "migration-tests:1",
+  status: "fail" as const,
+}
+
 describe("workflow artifact store", () => {
   test("keeps workflow paths inside the artifact root", async () => {
     const baseDir = await makeTempDir()
@@ -65,6 +109,31 @@ describe("workflow artifact store", () => {
 
     const workflowDirEntries = await fs.readdir(path.dirname(artifactPath))
     expect(workflowDirEntries.some((entry) => entry.endsWith(".tmp"))).toBe(false)
+  })
+
+  test("stores verification runs by iteration while updating the latest pointer", async () => {
+    const baseDir = await makeTempDir()
+    const store = createWorkflowArtifactStore(baseDir)
+    const secondRun = {
+      ...verificationRun,
+      artifactId: "verification-run-002",
+      iteration: 2,
+      commands: [{ ...verificationRun.commands[0], exitCode: 0, status: "pass" as const }],
+      failureSignature: null,
+      status: "pass" as const,
+    }
+
+    const firstPath = await store.writeVerificationRun(workflowState.workflowId, verificationRun)
+    const secondPath = await store.writeVerificationRun(workflowState.workflowId, secondRun)
+
+    expect(firstPath).toBe(getVerificationRunPath(baseDir, workflowState.workflowId, 1))
+    expect(secondPath).toBe(getVerificationRunPath(baseDir, workflowState.workflowId, 2))
+    expect(await store.readVerificationRun(workflowState.workflowId, 1)).toEqual(verificationRun)
+    expect(await store.readVerificationRun(workflowState.workflowId, 2)).toEqual(secondRun)
+    expect(await store.readLatestVerificationRun(workflowState.workflowId)).toEqual(secondRun)
+    expect(await store.listVerificationRuns(workflowState.workflowId)).toEqual([verificationRun, secondRun])
+    expect(await fs.readFile(getLatestVerificationRunPath(baseDir, workflowState.workflowId), "utf8"))
+      .toContain("verification-run-002")
   })
 
   test("lists persisted workflow states for lifecycle hooks", async () => {

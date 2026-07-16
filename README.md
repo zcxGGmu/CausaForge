@@ -120,7 +120,7 @@ Read https://raw.githubusercontent.com/zcxGGmu/CausaForge/refs/heads/main/README
 | :--- | :--- | :--- |
 | Evidence-chain workflow | Splits patch delivery into root cause, plan, implementation, verification, review, and delivery artifacts | `packages/causaforge-core/src/phases.ts` |
 | Seven workflow agents | Adds one primary orchestrator plus phase-specific subagents for analysis, planning, building, verification, review, and delivery | `packages/causaforge-opencode/src/agents/registry.ts` |
-| Eight workflow tools | Starts workflows, records artifacts, validates artifacts, captures diffs, moves phases, rolls back phases, reports status, and completes delivery | `packages/causaforge-opencode/src/tools/index.ts` |
+| Nine workflow tools | Starts workflows, records artifacts, validates artifacts, captures diffs, runs controlled verification manifests, moves phases, rolls back phases, reports status, and completes delivery | `packages/causaforge-opencode/src/tools/index.ts` |
 | Deterministic transition guard | Refuses phase changes when required artifacts, references, verification, review, sessions, or patch consistency are missing | `packages/causaforge-core/src/guards/transition-guard.ts` |
 | Scope-limited write guard | Allows product writes only from the building phase and only to paths approved by the patch plan | `packages/causaforge-opencode/src/hooks/tool-permission.ts` |
 | Independent review gate | Requires the reviewer session to differ from the builder session before review begins | `packages/causaforge-core/src/guards/session-guard.ts` |
@@ -166,6 +166,7 @@ SVG source: [`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaforge
 | `workflow_record_artifact` | Persist a phase artifact and its Markdown rendering when available |
 | `workflow_validate_artifact` | Validate an artifact against its Zod schema |
 | `workflow_capture_diff` | Capture the current Git diff as the implementation patch |
+| `workflow_run_verification` | Run a controlled local or SSH verification manifest and preserve per-iteration logs |
 | `workflow_transition` | Evaluate transition gates and persist the next phase |
 | `workflow_return_to_phase` | Move back to an earlier phase when a gate or review requires rework |
 | `workflow_complete` | Close the workflow from `delivering` to `completed` |
@@ -201,6 +202,7 @@ The OpenCode adapter currently parses these config fields:
 | `allow_plan_deviation` | `false` | Passed into the transition guard for approved-path scope checking |
 | `auto_continue_after_compaction` | `true` | Parsed as policy surface; compaction state hooks are exposed by the adapter |
 | `agents` | `{}` | Optional per-agent model, variant, and reasoning-effort overrides |
+| `verification` | local runner, max 5 iterations | Configures controlled local/SSH verification runners, allowed command prefixes, and iteration caps |
 
 ## Development
 

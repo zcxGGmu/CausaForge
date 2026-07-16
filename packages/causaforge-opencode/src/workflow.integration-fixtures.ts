@@ -3,9 +3,13 @@ import os from "node:os"
 import path from "node:path"
 import {
   getArtifactPath,
+  getLatestVerificationRunPath,
+  getVerificationRunPath,
   parseArtifact,
+  VerificationRunArtifactSchema,
   WorkflowStateSchema,
   type ArtifactKind,
+  type VerificationRunArtifact,
   type WorkflowArtifactStore,
   type WorkflowState,
 } from "@causaforge/core"
@@ -19,6 +23,7 @@ export const implementationPatch = "diff --git a/src/migrate.ts b/src/migrate.ts
 
 export type WorkflowHarness = {
   baseDir: string
+  commandCalls: Array<{ argv: string[]; cwd: string; timeoutMs?: number }>
   gitCalls: string[][]
   plugin: WorkflowPlugin
   store: InMemoryWorkflowStore
@@ -27,6 +32,8 @@ export type WorkflowHarness = {
 export class InMemoryWorkflowStore implements WorkflowArtifactStore {
   readonly states = new Map<string, WorkflowState>()
   readonly artifacts = new Map<string, unknown>()
+  readonly verificationRuns = new Map<string, VerificationRunArtifact>()
+  readonly latestVerificationRuns = new Map<string, VerificationRunArtifact>()
 
   constructor(readonly baseDir: string) {}
 
@@ -70,11 +77,45 @@ export class InMemoryWorkflowStore implements WorkflowArtifactStore {
   async artifactExists(workflowId: string, kind: ArtifactKind): Promise<boolean> {
     return this.artifacts.has(key(workflowId, kind))
   }
+
+  async readVerificationRun(workflowId: string, iteration: number): Promise<VerificationRunArtifact> {
+    const run = this.verificationRuns.get(iterationKey(workflowId, iteration))
+    if (!run) throw new Error(`Verification run not found: ${workflowId}/${iteration}`)
+    return VerificationRunArtifactSchema.parse(run)
+  }
+
+  async readLatestVerificationRun(workflowId: string): Promise<VerificationRunArtifact> {
+    const run = this.latestVerificationRuns.get(workflowId)
+    if (!run) throw new Error(`Latest verification run not found: ${workflowId}`)
+    return VerificationRunArtifactSchema.parse(run)
+  }
+
+  async writeVerificationRun(workflowId: string, value: VerificationRunArtifact): Promise<string> {
+    const parsed = VerificationRunArtifactSchema.parse(value)
+    if (parsed.workflowId !== workflowId) {
+      throw new Error(`Artifact verification-run workflowId ${parsed.workflowId} does not match target workflow ${workflowId}`)
+    }
+    this.verificationRuns.set(iterationKey(workflowId, parsed.iteration), parsed)
+    this.latestVerificationRuns.set(workflowId, parsed)
+    await fs.mkdir(path.dirname(getLatestVerificationRunPath(this.baseDir, workflowId)), { recursive: true })
+    return getVerificationRunPath(this.baseDir, workflowId, parsed.iteration)
+  }
+
+  async listVerificationRuns(workflowId: string): Promise<VerificationRunArtifact[]> {
+    return [...this.verificationRuns.values()]
+      .filter((run) => run.workflowId === workflowId)
+      .sort((a, b) => a.iteration - b.iteration)
+      .map((run) => VerificationRunArtifactSchema.parse(run))
+  }
 }
 
-export async function createHarness(options: { gitResult?: WorkflowGitResult } = {}): Promise<WorkflowHarness> {
+export async function createHarness(options: {
+  gitResult?: WorkflowGitResult
+  commandResults?: WorkflowGitResult[]
+} = {}): Promise<WorkflowHarness> {
   const baseDir = await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-opencode-integration-"))
   const store = new InMemoryWorkflowStore(baseDir)
+  const commandCalls: Array<{ argv: string[]; cwd: string; timeoutMs?: number }> = []
   const gitCalls: string[][] = []
   const plugin = createWorkflowPlugin({
     cwd: baseDir,
@@ -85,9 +126,15 @@ export async function createHarness(options: { gitResult?: WorkflowGitResult } =
         return options.gitResult ?? { exitCode: 0, stdout: implementationPatch, stderr: "" }
       },
     },
+    commandRunner: {
+      async run(request) {
+        commandCalls.push(request)
+        return options.commandResults?.shift() ?? { exitCode: 0, stdout: "", stderr: "" }
+      },
+    },
   })
 
-  return { baseDir, gitCalls, plugin, store }
+  return { baseDir, commandCalls, gitCalls, plugin, store }
 }
 
 export function makeArtifactChain(workflowId = "wf-001") {
@@ -213,4 +260,8 @@ export function stateIn(phase: WorkflowState["phase"], artifactRefs: WorkflowSta
 
 function key(workflowId: string, kind: ArtifactKind): string {
   return `${workflowId}:${kind}`
+}
+
+function iterationKey(workflowId: string, iteration: number): string {
+  return `${workflowId}:verification-run:${iteration}`
 }

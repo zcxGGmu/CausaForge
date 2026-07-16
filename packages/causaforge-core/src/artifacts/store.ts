@@ -1,7 +1,20 @@
 import fs from "node:fs/promises"
 import path from "node:path"
-import { WorkflowStateSchema, type WorkflowState } from "../schemas"
-import { ARTIFACT_ROOT_DIR, getArtifactPath, getWorkflowDir, getWorkflowStatePath, type ArtifactKind } from "./paths"
+import {
+  VerificationRunArtifactSchema,
+  WorkflowStateSchema,
+  type VerificationRunArtifact,
+  type WorkflowState,
+} from "../schemas"
+import {
+  ARTIFACT_ROOT_DIR,
+  getArtifactPath,
+  getLatestVerificationRunPath,
+  getVerificationRunPath,
+  getWorkflowDir,
+  getWorkflowStatePath,
+  type ArtifactKind,
+} from "./paths"
 import { parseArtifact } from "./validators"
 
 export interface WorkflowArtifactStore {
@@ -12,6 +25,10 @@ export interface WorkflowArtifactStore {
   readArtifact<T = unknown>(workflowId: string, kind: ArtifactKind): Promise<T>
   writeArtifact<T = unknown>(workflowId: string, kind: ArtifactKind, value: T): Promise<string>
   artifactExists(workflowId: string, kind: ArtifactKind): Promise<boolean>
+  readVerificationRun(workflowId: string, iteration: number): Promise<VerificationRunArtifact>
+  readLatestVerificationRun(workflowId: string): Promise<VerificationRunArtifact>
+  writeVerificationRun(workflowId: string, value: VerificationRunArtifact): Promise<string>
+  listVerificationRuns(workflowId: string): Promise<VerificationRunArtifact[]>
 }
 
 export function createWorkflowArtifactStore(baseDir: string): WorkflowArtifactStore {
@@ -71,6 +88,48 @@ export function createWorkflowArtifactStore(baseDir: string): WorkflowArtifactSt
         return false
       }
     },
+
+    async readVerificationRun(workflowId, iteration) {
+      const value = await readJson(getVerificationRunPath(baseDir, workflowId, iteration))
+      const parsed = VerificationRunArtifactSchema.parse(value)
+      assertWorkflowId("verification-run", workflowId, parsed.workflowId)
+      return parsed
+    },
+
+    async readLatestVerificationRun(workflowId) {
+      const value = await readJson(getLatestVerificationRunPath(baseDir, workflowId))
+      const parsed = VerificationRunArtifactSchema.parse(value)
+      assertWorkflowId("verification-run", workflowId, parsed.workflowId)
+      return parsed
+    },
+
+    async writeVerificationRun(workflowId, value) {
+      const parsed = VerificationRunArtifactSchema.parse(value)
+      assertWorkflowId("verification-run", workflowId, parsed.workflowId)
+      const filePath = getVerificationRunPath(baseDir, workflowId, parsed.iteration)
+      await writeJsonAtomic(filePath, parsed)
+      await writeJsonAtomic(getLatestVerificationRunPath(baseDir, workflowId), parsed)
+      return filePath
+    },
+
+    async listVerificationRuns(workflowId) {
+      const iterationRoot = path.join(getWorkflowDir(baseDir, workflowId), "iterations")
+      let entries: Array<{ name: string; isDirectory(): boolean }>
+      try {
+        entries = await fs.readdir(iterationRoot, { withFileTypes: true })
+      } catch (error) {
+        if (isMissingPathError(error)) return []
+        throw error
+      }
+
+      const runs: VerificationRunArtifact[] = []
+      for (const entry of entries.filter((item) => item.isDirectory()).sort((a, b) => a.name.localeCompare(b.name))) {
+        const iteration = Number(entry.name)
+        if (!Number.isInteger(iteration) || iteration < 1) continue
+        runs.push(await this.readVerificationRun(workflowId, iteration))
+      }
+      return runs
+    },
   }
 }
 
@@ -86,6 +145,10 @@ async function writeJsonAtomic(filePath: string, value: unknown): Promise<void> 
 }
 
 function assertArtifactWorkflowId(workflowId: string, kind: ArtifactKind, artifactWorkflowId: string): void {
+  assertWorkflowId(kind, workflowId, artifactWorkflowId)
+}
+
+function assertWorkflowId(kind: string, workflowId: string, artifactWorkflowId: string): void {
   if (artifactWorkflowId !== workflowId) {
     throw new Error(`Artifact ${kind} workflowId ${artifactWorkflowId} does not match target workflow ${workflowId}`)
   }
@@ -95,4 +158,4 @@ function isMissingPathError(error: unknown): boolean {
   return error instanceof Error && "code" in error && error.code === "ENOENT"
 }
 
-export { getArtifactPath, getWorkflowDir, getWorkflowStatePath }
+export { getArtifactPath, getLatestVerificationRunPath, getVerificationRunPath, getWorkflowDir, getWorkflowStatePath }

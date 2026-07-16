@@ -8,6 +8,7 @@ const workflowToolNames = [
   "workflow_record_artifact",
   "workflow_validate_artifact",
   "workflow_capture_diff",
+  "workflow_run_verification",
   "workflow_transition",
   "workflow_return_to_phase",
   "workflow_complete",
@@ -39,6 +40,11 @@ async function deps() {
     cwd: await makeTempDir(),
     store: createWorkflowArtifactStore(await makeTempDir()),
     git: {
+      async run() {
+        return { exitCode: 0, stdout: "", stderr: "" }
+      },
+    },
+    commandRunner: {
       async run() {
         return { exitCode: 0, stdout: "", stderr: "" }
       },

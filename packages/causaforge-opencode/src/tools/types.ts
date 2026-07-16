@@ -6,6 +6,7 @@ import type {
   WorkflowArtifactStore,
   WorkflowPhase,
   WorkflowState,
+  TestSuiteManifest,
 } from "@causaforge/core"
 import type { WorkflowOpenCodeConfig } from "../config/schema"
 
@@ -19,11 +20,22 @@ export interface WorkflowGitRunner {
   run(args: string[]): Promise<WorkflowGitResult>
 }
 
+export interface WorkflowCommandRunnerRequest {
+  argv: string[]
+  cwd: string
+  timeoutMs?: number
+}
+
+export interface WorkflowCommandRunner {
+  run(request: WorkflowCommandRunnerRequest): Promise<WorkflowGitResult>
+}
+
 export interface WorkflowToolDeps {
   cwd: string
   config: WorkflowOpenCodeConfig
   store: WorkflowArtifactStore
   git: WorkflowGitRunner
+  commandRunner: WorkflowCommandRunner
 }
 
 export interface WorkflowTool<Input, Output> {
@@ -38,6 +50,7 @@ export type WorkflowToolName =
   | "workflow_record_artifact"
   | "workflow_validate_artifact"
   | "workflow_capture_diff"
+  | "workflow_run_verification"
   | "workflow_transition"
   | "workflow_return_to_phase"
   | "workflow_complete"
@@ -90,6 +103,24 @@ export interface WorkflowCaptureDiffOutput {
   changedFiles: string[]
 }
 
+export interface WorkflowRunVerificationInput {
+  workflowId: string
+  patchCandidateArtifactId: string
+  iteration: number
+  manifest: TestSuiteManifest
+  now?: string
+}
+
+export interface WorkflowRunVerificationOutput {
+  workflowId: string
+  iteration: number
+  status: "pass" | "fail" | "infra_error"
+  verificationRunArtifactId: string
+  verificationArtifactId: string
+  verificationRunPath: string
+  verificationArtifactPath: string
+}
+
 export interface WorkflowTransitionInput extends Omit<TransitionRequest, "workflowId"> {
   workflowId: string
   artifacts?: WorkflowArtifactChain
@@ -125,6 +156,7 @@ export interface WorkflowTools {
   workflow_record_artifact: WorkflowTool<WorkflowRecordArtifactInput, WorkflowRecordArtifactOutput>
   workflow_validate_artifact: WorkflowTool<WorkflowValidateArtifactInput, WorkflowValidateArtifactOutput>
   workflow_capture_diff: WorkflowTool<WorkflowCaptureDiffInput, WorkflowCaptureDiffOutput>
+  workflow_run_verification: WorkflowTool<WorkflowRunVerificationInput, WorkflowRunVerificationOutput>
   workflow_transition: WorkflowTool<WorkflowTransitionInput, WorkflowTransitionOutput>
   workflow_return_to_phase: WorkflowTool<WorkflowReturnToPhaseInput, WorkflowTransitionOutput>
   workflow_complete: WorkflowTool<WorkflowCompleteInput, WorkflowTransitionOutput>

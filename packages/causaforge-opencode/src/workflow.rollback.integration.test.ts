@@ -12,6 +12,125 @@ import {
 } from "./workflow.integration-fixtures"
 
 describe("workflow rollback integration", () => {
+  test("runs iterative verification until the patch passes", async () => {
+    const { commandCalls, plugin, store } = await createHarness({
+      commandResults: [
+        { exitCode: 1, stdout: "field missing", stderr: "expected migrated field" },
+        { exitCode: 0, stdout: "12 tests passed", stderr: "" },
+      ],
+    })
+    const { rootCause, patchPlan, patchCandidate } = makeArtifactChain()
+    const manifest = {
+      suiteId: "migration-suite",
+      source: "user" as const,
+      runnerId: "local",
+      commands: [
+        {
+          commandId: "migration-tests",
+          argv: ["bun", "test", "src/migrate.test.ts"],
+          required: true,
+          timeoutSeconds: 300,
+        },
+      ],
+    }
+
+    await store.initializeWorkflow(stateIn("building", {
+      rootCauseArtifactId: rootCause.artifactId,
+      patchPlanArtifactId: patchPlan.artifactId,
+    }))
+    await store.writeArtifact("wf-001", "root-cause", rootCause)
+    await store.writeArtifact("wf-001", "patch-plan", patchPlan)
+    await store.writeArtifact("wf-001", "patch-candidate", patchCandidate)
+
+    await plugin.tools.workflow_transition.execute({
+      workflowId: "wf-001",
+      expectedPhase: "building",
+      targetPhase: "verifying",
+      requestedByAgent: "patch-builder",
+      sessionId: "session-builder-001",
+      now: nextTimestamp,
+    })
+    const failedRun = await plugin.tools.workflow_run_verification.execute({
+      workflowId: "wf-001",
+      patchCandidateArtifactId: patchCandidate.artifactId,
+      iteration: 1,
+      manifest,
+      now: nextTimestamp,
+    })
+
+    expect(failedRun).toMatchObject({ iteration: 1, status: "fail", verificationArtifactId: "verification-0001" })
+    await expect(plugin.tools.workflow_transition.execute({
+      workflowId: "wf-001",
+      expectedPhase: "verifying",
+      targetPhase: "reviewing",
+      requestedByAgent: "regression-verifier",
+      sessionId: "session-reviewer-001",
+      now: nextTimestamp,
+    })).rejects.toThrow("VERIFICATION_FAILED")
+
+    await plugin.tools.workflow_return_to_phase.execute({
+      workflowId: "wf-001",
+      targetPhase: "building",
+      requestedByAgent: "regression-verifier",
+      sessionId: "session-verifier-001",
+      now: nextTimestamp,
+    })
+
+    const patchedCandidate = {
+      ...patchCandidate,
+      artifactId: "patch-candidate-002",
+      patchSummary: "Preserve the migrated field after verification failure.",
+      implementationNotes: ["Fixed the missing migrated field after the first failed verification run."],
+    }
+    await store.writeArtifact("wf-001", "patch-candidate", patchedCandidate)
+    await plugin.tools.workflow_transition.execute({
+      workflowId: "wf-001",
+      expectedPhase: "building",
+      targetPhase: "verifying",
+      requestedByAgent: "patch-builder",
+      sessionId: "session-builder-002",
+      now: finalTimestamp,
+    })
+    const passedRun = await plugin.tools.workflow_run_verification.execute({
+      workflowId: "wf-001",
+      patchCandidateArtifactId: patchedCandidate.artifactId,
+      iteration: 2,
+      manifest,
+      now: finalTimestamp,
+    })
+    const latestVerification = await store.readArtifact("wf-001", "verification")
+    const reviewed = await plugin.tools.workflow_transition.execute({
+      workflowId: "wf-001",
+      expectedPhase: "verifying",
+      targetPhase: "reviewing",
+      requestedByAgent: "regression-verifier",
+      sessionId: "session-reviewer-002",
+      now: finalTimestamp,
+    })
+
+    expect(commandCalls).toHaveLength(2)
+    expect(passedRun).toMatchObject({ iteration: 2, status: "pass", verificationArtifactId: "verification-0002" })
+    expect(await store.listVerificationRuns("wf-001")).toHaveLength(2)
+    expect(await store.readLatestVerificationRun("wf-001")).toMatchObject({
+      artifactId: "verification-run-0002",
+      status: "pass",
+    })
+    expect(latestVerification).toMatchObject({
+      artifactId: "verification-0002",
+      patchCandidateArtifactId: "patch-candidate-002",
+      status: "pass",
+    })
+    expect(reviewed).toMatchObject({
+      phase: "reviewing",
+      builderSessionId: "session-builder-002",
+      reviewerSessionId: "session-reviewer-002",
+      artifactRefs: {
+        patchCandidateArtifactId: "patch-candidate-002",
+        verificationArtifactId: "verification-0002",
+      },
+    })
+  })
+
   test("returns from failed verification to building", async () => {
     const { plugin, store } = await createHarness()
     const { rootCause, patchPlan, patchCandidate, verification } = makeArtifactChain()

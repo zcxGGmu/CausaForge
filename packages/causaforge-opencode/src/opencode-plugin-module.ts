@@ -47,21 +47,44 @@ function createWorkflowPluginRuntime(input: PluginInput): {
       store,
       git: {
         async run(args) {
-          const proc = Bun.spawn(["git", ...args], {
-            cwd: input.directory,
-            stdout: "pipe",
-            stderr: "pipe",
-          })
-          const [stdout, stderr, exitCode] = await Promise.all([
-            new Response(proc.stdout).text(),
-            new Response(proc.stderr).text(),
-            proc.exited,
-          ])
-          return { exitCode, stdout, stderr }
+          return runProcess(["git", ...args], input.directory)
+        },
+      },
+      commandRunner: {
+        async run(request) {
+          return runProcess(request.argv, request.cwd, request.timeoutMs)
         },
       },
     }),
   }
+}
+
+async function runProcess(argv: string[], cwd: string, timeoutMs?: number): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+  const proc = Bun.spawn(argv, {
+    cwd,
+    stdout: "pipe",
+    stderr: "pipe",
+  })
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  const exitPromise: Promise<number> = timeoutMs
+    ? Promise.race([
+      proc.exited,
+      new Promise<number>((resolve) => {
+        timeout = setTimeout(() => {
+          proc.kill()
+          resolve(124)
+        }, timeoutMs)
+      }),
+    ])
+    : proc.exited
+
+  const [stdout, stderr, exitCode] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    exitPromise,
+  ])
+  if (timeout) clearTimeout(timeout)
+  return { exitCode, stdout, stderr }
 }
 
 function createWorkflowOpenCodeHooks(runtime: {

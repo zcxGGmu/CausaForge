@@ -61,13 +61,14 @@ describe("workflow tool permission guard", () => {
     })).toEqual({ allowed: false, reason: "UNAUTHORIZED_TOOL" })
   })
 
-  test("allows the eight workflow tools without write permissions", () => {
+  test("allows the nine workflow tools without write permissions", () => {
     const workflowTools = [
       "workflow_start",
       "workflow_status",
       "workflow_record_artifact",
       "workflow_validate_artifact",
       "workflow_capture_diff",
+      "workflow_run_verification",
       "workflow_transition",
       "workflow_return_to_phase",
       "workflow_complete",

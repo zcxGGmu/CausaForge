@@ -11,13 +11,14 @@ import {
   recordCommandEvidence,
   restoreCompactionState,
 } from "./hooks"
-import { createWorkflowTools, type WorkflowGitRunner, type WorkflowTools } from "./tools"
+import { createWorkflowTools, type WorkflowCommandRunner, type WorkflowGitRunner, type WorkflowTools } from "./tools"
 
 export interface WorkflowPluginDeps {
   cwd: string
   config?: unknown
   store: WorkflowArtifactStore
   git: WorkflowGitRunner
+  commandRunner: WorkflowCommandRunner
 }
 
 export interface WorkflowPluginHooks {
@@ -44,7 +45,13 @@ export function createWorkflowPlugin(deps: WorkflowPluginDeps): WorkflowPlugin {
   return {
     config,
     agents: createWorkflowAgents(context),
-    tools: createWorkflowTools({ cwd: deps.cwd, config, store: deps.store, git: deps.git }),
+    tools: createWorkflowTools({
+      cwd: deps.cwd,
+      config,
+      store: deps.store,
+      git: deps.git,
+      commandRunner: deps.commandRunner,
+    }),
     hooks: {
       phaseContext: createPhaseContext,
       toolPermission: evaluateToolPermission,

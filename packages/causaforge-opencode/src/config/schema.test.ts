@@ -20,7 +20,65 @@ describe("workflow OpenCode config schema", () => {
       allow_plan_deviation: false,
       auto_continue_after_compaction: true,
       agents: {},
+      verification: {
+        max_iterations: 5,
+        runners: [
+          {
+            id: "local",
+            type: "local",
+            cwd: ".",
+            allowedCommands: [
+              ["bun", "test"],
+              ["bun", "run", "typecheck"],
+              ["bun", "run", "build"],
+              ["git", "diff", "--check"],
+            ],
+          },
+        ],
+      },
     })
+  })
+
+  test("accepts explicit local and ssh verification runners", () => {
+    expect(
+      parseWorkflowConfig({
+        verification: {
+          max_iterations: 3,
+          runners: [
+            { id: "local-fast", type: "local", cwd: ".", allowedCommands: [["bun", "test"]] },
+            {
+              id: "remote-ci",
+              type: "ssh",
+              host: "ci-box",
+              cwd: "/srv/project",
+              allowedCommands: [["bun", "test"], ["pytest"]],
+            },
+          ],
+        },
+      }).verification,
+    ).toEqual({
+      max_iterations: 3,
+      runners: [
+        { id: "local-fast", type: "local", cwd: ".", allowedCommands: [["bun", "test"]] },
+        {
+          id: "remote-ci",
+          type: "ssh",
+          host: "ci-box",
+          cwd: "/srv/project",
+          allowedCommands: [["bun", "test"], ["pytest"]],
+        },
+      ],
+    })
+  })
+
+  test("rejects ssh runners without an explicit allowed command list", () => {
+    expect(() =>
+      parseWorkflowConfig({
+        verification: {
+          runners: [{ id: "remote-ci", type: "ssh", host: "ci-box", cwd: "/srv/project" }],
+        },
+      }),
+    ).toThrow()
   })
 
   test("accepts only normalized workflow agent overrides", () => {

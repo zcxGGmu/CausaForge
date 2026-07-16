@@ -120,7 +120,7 @@ printf '{\n  "plugin": ["%s"]\n}\n' "$PLUGIN_PATH" > .opencode/opencode.json
 | :--- | :--- | :--- |
 | Evidence-chain workflow | 将补丁交付拆成 root cause、plan、implementation、verification、review 和 delivery 产物 | `packages/causaforge-core/src/phases.ts` |
 | 七个 workflow agents | 提供一个 primary orchestrator，以及面向分析、计划、构建、验证、审查和交付的阶段 subagents | `packages/causaforge-opencode/src/agents/registry.ts` |
-| 八个 workflow tools | 启动 workflow、记录 artifact、校验 artifact、捕获 diff、推进 phase、回滚 phase、报告状态并完成交付 | `packages/causaforge-opencode/src/tools/index.ts` |
+| 九个 workflow tools | 启动 workflow、记录 artifact、校验 artifact、捕获 diff、执行受控验证 manifest、推进 phase、回滚 phase、报告状态并完成交付 | `packages/causaforge-opencode/src/tools/index.ts` |
 | 确定性 transition guard | 当缺少必要 artifact、引用、验证、审查、session 或 patch 一致性时拒绝阶段推进 | `packages/causaforge-core/src/guards/transition-guard.ts` |
 | Scope-limited write guard | 只允许 building 阶段写产品代码，并且只能写 patch plan 批准的路径 | `packages/causaforge-opencode/src/hooks/tool-permission.ts` |
 | Independent review gate | 要求 reviewer session 与 builder session 不同，之后才能进入 review | `packages/causaforge-core/src/guards/session-guard.ts` |
@@ -166,6 +166,7 @@ SVG 源文件：[`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaf
 | `workflow_record_artifact` | 持久化阶段 artifact，并在支持时写入 Markdown rendering |
 | `workflow_validate_artifact` | 用 Zod schema 校验 artifact |
 | `workflow_capture_diff` | 捕获当前 Git diff 作为 implementation patch |
+| `workflow_run_verification` | 执行受控的本地或 SSH 验证 manifest，并保留每轮日志 |
 | `workflow_transition` | 评估 transition gates 并持久化下一阶段 |
 | `workflow_return_to_phase` | 当 gate 或 review 需要返工时回到早期 phase |
 | `workflow_complete` | 从 `delivering` 关闭 workflow 到 `completed` |
@@ -201,6 +202,7 @@ OpenCode adapter 当前会解析这些配置字段：
 | `allow_plan_deviation` | `false` | 传给 transition guard，用于批准路径 scope 检查 |
 | `auto_continue_after_compaction` | `true` | 作为 policy surface 解析；adapter 暴露 compaction state hooks |
 | `agents` | `{}` | 可选的 per-agent model、variant 和 reasoning-effort overrides |
+| `verification` | local runner, max 5 iterations | 配置受控本地/SSH 验证 runner、允许的命令前缀和迭代上限 |
 
 ## 开发
 

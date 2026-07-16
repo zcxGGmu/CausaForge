@@ -10,6 +10,13 @@ export {
   VerificationCriterionResultSchema,
   validateVerificationAgainstRootCause,
 } from "./verification"
+export {
+  TestSuiteManifestSchema,
+  VerificationCommandSchema,
+  VerificationRunArtifactSchema,
+  VerificationRunCommandResultSchema,
+  VerificationRunnerRefSchema,
+} from "./iteration"
 export { ReviewArtifactSchema, ReviewFindingSchema } from "./review"
 export { DeliveryArtifactSchema } from "./delivery"
 
@@ -24,5 +31,12 @@ export type {
   VerificationCheck,
   VerificationCriterionResult,
 } from "./verification"
+export type {
+  TestSuiteManifest,
+  VerificationCommand,
+  VerificationRunArtifact,
+  VerificationRunCommandResult,
+  VerificationRunnerRef,
+} from "./iteration"
 export type { ReviewArtifact, ReviewFinding } from "./review"
 export type { DeliveryArtifact } from "./delivery"

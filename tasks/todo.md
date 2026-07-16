@@ -1,5 +1,23 @@
 # CausaForge 当前执行计划
 
+## Stage 13：多轮 Agent 迭代验证闭环
+
+- [x] 定义 core 层迭代验证协议：test manifest、verification run、iteration attempt schema 与版本化 artifact paths
+- [x] 以 TDD 增加 schema/store 测试，确保每轮失败和成功验证证据不会被覆盖
+- [x] 在 OpenCode adapter 增加受控 `workflow_run_verification` tool，支持本地 runner 执行 manifest 命令并写入 iteration 证据
+- [x] 将 tool surface、权限 hook、agent prompt 和 markdown/evidence renderer 接入多轮验证闭环
+- [x] 增加集成测试覆盖“一轮失败后回 building，第二轮通过后进入 review”的流程
+- [x] 更新 README / ROADMAP，说明当前支持的多轮迭代范围与 SSH runner 的安全边界
+- [x] 运行相关包测试、typecheck、build、严格旧标识扫描、`git diff --check`，并写入 `.causaforge/evidence/20260717-iterative-verification/`
+
+### Stage 13 Review
+
+- Core 新增 `TestSuiteManifest` 与 `VerificationRunArtifact` 协议，并将 verification run 按 `.workflow/<workflowId>/iterations/<000N>/verification-run.json` 持久化，同时维护 `verification/latest-run.json`。
+- OpenCode adapter 新增 `workflow_run_verification`，通过配置化 local/SSH runner 和允许命令前缀执行受控 manifest，记录每轮 stdout/stderr 日志并同步生成现有 transition gate 可读取的 `verification.json`。
+- 多轮闭环已由集成测试覆盖：第一轮 verification fail 阻止 review，workflow 返回 building；第二轮 verification pass 后进入 independent review，并保留两轮 run history。
+- README / README.zh-CN / ROADMAP 已更新为九个 workflow tools，并说明 verification runner、SSH runner 与迭代上限配置。
+- 验证证据写入 `.causaforge/evidence/20260717-iterative-verification/`：95 个测试、typecheck、build、diff check 和严格旧标识扫描均通过。
+
 ## Stage 4：严格零旧产品标识清理
 
 - [x] 运行严格扫描并确认旧标识仍存在于 package、目录名、文档、测试、证据和发布脚本中

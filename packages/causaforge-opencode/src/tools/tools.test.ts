@@ -2,7 +2,7 @@ import fs from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
 import { describe, expect, test } from "bun:test"
-import { createWorkflowArtifactStore, getArtifactPath, getWorkflowDir } from "@causaforge/core"
+import { createWorkflowArtifactStore, getArtifactPath, getVerificationRunPath, getWorkflowDir } from "@causaforge/core"
 import { parseWorkflowConfig } from "../config/schema"
 import { createWorkflowTools } from "./index"
 
@@ -43,6 +43,34 @@ const patchPlan = {
   status: "approved" as const,
 }
 
+const patchCandidate = {
+  schemaVersion: "1.0" as const,
+  workflowId: "wf-001",
+  artifactId: "patch-candidate-001",
+  createdAt: timestamp,
+  patchPlanArtifactId: patchPlan.artifactId,
+  modifiedFiles: ["src/migrate.ts"],
+  patchPath: "implementation/patch.diff",
+  patchSummary: "Preserve the migrated field during normalization.",
+  planDeviations: [],
+  implementationNotes: ["Added the field to the normalized object."],
+  status: "ready_for_verification" as const,
+}
+
+const manifest = {
+  suiteId: "migration-suite",
+  source: "user" as const,
+  runnerId: "local",
+  commands: [
+    {
+      commandId: "migration-tests",
+      argv: ["bun", "test", "src/migrate.test.ts"],
+      required: true,
+      timeoutSeconds: 300,
+    },
+  ],
+}
+
 describe("workflow tools", () => {
   test("registers the deterministic workflow tool surface", async () => {
     const { tools } = await makeTools()
@@ -53,6 +81,7 @@ describe("workflow tools", () => {
       "workflow_record_artifact",
       "workflow_validate_artifact",
       "workflow_capture_diff",
+      "workflow_run_verification",
       "workflow_transition",
       "workflow_return_to_phase",
       "workflow_complete",
@@ -124,6 +153,54 @@ describe("workflow tools", () => {
       .toContain("diff --git")
   })
 
+  test("runs verification manifests and preserves iteration history", async () => {
+    const { baseDir, commandCalls, store, tools } = await makeTools({
+      commandResults: [
+        { exitCode: 1, stdout: "field missing", stderr: "expected field" },
+        { exitCode: 0, stdout: "12 tests passed", stderr: "" },
+      ],
+    })
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+    await store.writeArtifact("wf-001", "root-cause", rootCause)
+    await store.writeArtifact("wf-001", "patch-plan", patchPlan)
+    await store.writeArtifact("wf-001", "patch-candidate", patchCandidate)
+
+    const failed = await tools.workflow_run_verification.execute({
+      workflowId: "wf-001",
+      patchCandidateArtifactId: patchCandidate.artifactId,
+      iteration: 1,
+      manifest,
+      now: timestamp,
+    })
+
+    expect(failed.status).toBe("fail")
+    expect(failed.verificationRunPath).toBe(getVerificationRunPath(baseDir, "wf-001", 1))
+    expect(commandCalls[0]).toMatchObject({
+      argv: ["bun", "test", "src/migrate.test.ts"],
+      cwd: baseDir,
+      timeoutMs: 300_000,
+    })
+    expect(await fs.readFile(path.join(getWorkflowDir(baseDir, "wf-001"), "iterations", "0001", "logs", "migration-tests.stdout.txt"), "utf8"))
+      .toBe("field missing")
+    expect((await store.readArtifact("wf-001", "verification"))).toMatchObject({ status: "fail" })
+
+    const passed = await tools.workflow_run_verification.execute({
+      workflowId: "wf-001",
+      patchCandidateArtifactId: patchCandidate.artifactId,
+      iteration: 2,
+      manifest,
+      now: "2026-07-13T00:05:00.000Z",
+    })
+
+    expect(passed.status).toBe("pass")
+    expect(await store.listVerificationRuns("wf-001")).toHaveLength(2)
+    expect(await store.readLatestVerificationRun("wf-001")).toMatchObject({ artifactId: "verification-run-0002", status: "pass" })
+    expect((await store.readArtifact("wf-001", "verification"))).toMatchObject({
+      artifactId: "verification-0002",
+      status: "pass",
+    })
+  })
+
 
   test("return to phase rejects terminal or forward targets", async () => {
     const { tools } = await makeTools()
@@ -147,10 +224,14 @@ describe("workflow tools", () => {
   })
 })
 
-async function makeTools(options: { gitResult?: { exitCode: number; stdout: string; stderr: string } } = {}) {
+async function makeTools(options: {
+  gitResult?: { exitCode: number; stdout: string; stderr: string }
+  commandResults?: Array<{ exitCode: number; stdout: string; stderr: string }>
+} = {}) {
   const baseDir = await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-opencode-tools-"))
   const store = createWorkflowArtifactStore(baseDir)
   const gitCalls: string[][] = []
+  const commandCalls: Array<{ argv: string[]; cwd: string; timeoutMs?: number }> = []
   const tools = createWorkflowTools({
     cwd: baseDir,
     config: parseWorkflowConfig({}),
@@ -161,6 +242,12 @@ async function makeTools(options: { gitResult?: { exitCode: number; stdout: stri
         return options.gitResult ?? { exitCode: 0, stdout: "", stderr: "" }
       },
     },
+    commandRunner: {
+      async run(request) {
+        commandCalls.push(request)
+        return options.commandResults?.shift() ?? { exitCode: 0, stdout: "", stderr: "" }
+      },
+    },
   })
-  return { baseDir, gitCalls, store, tools }
+  return { baseDir, commandCalls, gitCalls, store, tools }
 }
