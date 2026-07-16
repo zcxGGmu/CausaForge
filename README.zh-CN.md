@@ -145,6 +145,14 @@ SVG 源文件：[`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaf
 | `completed` | protocol state | 完整 artifact chain | workflow 关闭 |
 | `blocked` | protocol state | 当前证据 | workflow 被有意停止 |
 
+### 多轮 Agent 迭代
+
+<img src="./docs/diagrams/causaforge-iterative-agent-loop.png" alt="CausaForge 多轮 Agent 迭代闭环图" width="100%" />
+
+SVG 源文件：[`docs/diagrams/causaforge-iterative-agent-loop.svg`](./docs/diagrams/causaforge-iterative-agent-loop.svg)
+
+回修闭环被刻意收窄：只有 `patch-builder` 能修改产品文件，`workflow_run_verification` 只执行配置好的本地或 SSH runner，并且每一轮失败或通过的验证都会保存在 `.workflow/<workflowId>/iterations/<000N>/`。必需检查失败时会记录 failure evidence 并返回 `building`；只有通过的 verification 才能进入 independent review。
+
 ## Agent 阵容
 
 | Agent id | Mode | 职责 |
@@ -153,7 +161,7 @@ SVG 源文件：[`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaf
 | `root-cause-analyst` | subagent | 调查问题并记录 confirmed root cause |
 | `patch-planner` | subagent | 将 root cause 转换成最小批准文件变更计划 |
 | `patch-builder` | subagent | 只修改批准的产品路径，并记录 patch candidate |
-| `regression-verifier` | subagent | 运行验证，并记录针对 root-cause criteria 的命令证据 |
+| `regression-verifier` | subagent | 执行受控验证 manifest，并记录针对 root-cause criteria 的命令证据 |
 | `patch-reviewer` | subagent | 独立审查 patch scope、verification sufficiency 和 blocking risks |
 | `delivery-coordinator` | subagent | 打包最终 delivery artifact 和 handoff summary |
 

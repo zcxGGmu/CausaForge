@@ -145,6 +145,14 @@ SVG source: [`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaforge
 | `completed` | protocol state | complete artifact chain | workflow is closed |
 | `blocked` | protocol state | current evidence | workflow is intentionally stopped |
 
+### Multi-Round Agent Iteration
+
+<img src="./docs/diagrams/causaforge-iterative-agent-loop.png" alt="CausaForge multi-round agent iteration loop" width="100%" />
+
+SVG source: [`docs/diagrams/causaforge-iterative-agent-loop.svg`](./docs/diagrams/causaforge-iterative-agent-loop.svg)
+
+The repair loop is intentionally narrow: only `patch-builder` edits product files, `workflow_run_verification` executes configured local or SSH runners, and every failed or passing run is preserved under `.workflow/<workflowId>/iterations/<000N>/`. A failed required check records failure evidence and returns the workflow to `building`; only a passing verification can advance to independent review.
+
 ## Agent Roster
 
 | Agent id | Mode | Responsibility |
@@ -153,7 +161,7 @@ SVG source: [`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaforge
 | `root-cause-analyst` | subagent | Investigates the problem and records the confirmed root cause |
 | `patch-planner` | subagent | Converts the root cause into a minimal approved file-change plan |
 | `patch-builder` | subagent | Implements only approved product paths and records the patch candidate |
-| `regression-verifier` | subagent | Runs verification and records command evidence against root-cause criteria |
+| `regression-verifier` | subagent | Runs controlled verification manifests and records command evidence against root-cause criteria |
 | `patch-reviewer` | subagent | Reviews patch scope, verification sufficiency, and blocking risks independently |
 | `delivery-coordinator` | subagent | Packages the final delivery artifact and handoff summary |
 

@@ -1,5 +1,20 @@
 # CausaForge 当前执行计划
 
+## Stage 14：README 多轮 Agent 迭代架构图
+
+- [x] 新增多轮 agent 迭代闭环 SVG/PNG 图，展示 builder、verification runner、failure evidence、回修和 review gate
+- [x] 将图嵌入 README 与 README.zh-CN，并补充简短架构说明
+- [x] 渲染 PNG 并进行视觉 QA，确认文字、箭头和节点没有重叠或裁切
+- [x] 运行 README 链接检查、SVG/XML 校验、测试、typecheck、build、diff check 和严格旧标识扫描
+- [x] 写入 `.causaforge/evidence/20260717-iterative-agent-loop-diagram/` 证据并创建中文阶段提交
+
+### Stage 14 Review
+
+- 新增 `docs/diagrams/causaforge-iterative-agent-loop.svg` 与 PNG，展示 patch production path、受控 verification runner、failure evidence、evidence store、return_to_phase(building) 和 review/delivery gate。
+- README 与 README.zh-CN 在 Workflow 表后新增多轮 Agent 迭代小节，帮助用户和开发者理解失败验证如何回到 building 并保留每轮证据。
+- 图示已通过 XML 校验、PNG 渲染和人工视觉 QA；未发现文字重叠、箭头穿过文本或裁切。
+- 验证证据写入 `.causaforge/evidence/20260717-iterative-agent-loop-diagram/`：README 链接、SVG/XML、PNG 渲染、95 个测试、typecheck、build、diff check 和严格旧标识扫描均通过。
+
 ## Stage 13：多轮 Agent 迭代验证闭环
 
 - [x] 定义 core 层迭代验证协议：test manifest、verification run、iteration attempt schema 与版本化 artifact paths

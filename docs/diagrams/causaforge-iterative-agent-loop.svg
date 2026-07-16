@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760" role="img" aria-labelledby="title desc">
+  <title id="title">CausaForge Iterative Agent Loop</title>
+  <desc id="desc">Multi-round agent optimization flow showing patch building, controlled verification runners, failure evidence, repair loops, review, and delivery gates.</desc>
+  <style>
+    text { font-family: Inter, Arial, Helvetica, sans-serif; fill: #111827; }
+    .title { font-size: 24px; font-weight: 700; }
+    .subtitle { font-size: 13px; fill: #6b7280; }
+    .section-title { font-size: 15px; font-weight: 700; }
+    .node-title { font-size: 14px; font-weight: 700; }
+    .node-sub { font-size: 12px; fill: #6b7280; }
+    .small { font-size: 11px; fill: #6b7280; }
+    .label { font-size: 11px; fill: #374151; }
+    .gate { font-size: 12px; font-weight: 700; fill: #374151; }
+  </style>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9333ea"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <text x="40" y="44" class="title">Multi-Round Agent Iteration Loop</text>
+  <text x="40" y="68" class="subtitle">CausaForge keeps code edits in Building, runs tests through controlled verification runners, and preserves every failed and passing attempt as evidence.</text>
+
+  <rect x="40" y="104" width="1120" height="176" rx="16" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="58" y="132" class="section-title">Patch production path</text>
+  <text x="58" y="153" class="subtitle">Only the patch-builder modifies product files, and only inside approved patch-plan scope.</text>
+
+  <rect x="70" y="185" width="160" height="72" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="150" y="211" text-anchor="middle" class="node-title">Root Cause</text>
+  <text x="150" y="232" text-anchor="middle" class="node-sub">criteria and scope</text>
+  <text x="150" y="248" text-anchor="middle" class="node-sub">root-cause.json</text>
+
+  <rect x="270" y="185" width="160" height="72" rx="10" fill="#faf5ff" stroke="#ddd6fe" stroke-width="1.5"/>
+  <text x="350" y="211" text-anchor="middle" class="node-title">Patch Plan</text>
+  <text x="350" y="232" text-anchor="middle" class="node-sub">approved paths</text>
+  <text x="350" y="248" text-anchor="middle" class="node-sub">verification plan</text>
+
+  <rect x="470" y="185" width="170" height="72" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="555" y="211" text-anchor="middle" class="node-title">Patch Builder</text>
+  <text x="555" y="232" text-anchor="middle" class="node-sub">edits product code</text>
+  <text x="555" y="248" text-anchor="middle" class="node-sub">patch-candidate</text>
+
+  <rect x="680" y="185" width="170" height="72" rx="10" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="765" y="211" text-anchor="middle" class="node-title">Capture Diff</text>
+  <text x="765" y="232" text-anchor="middle" class="node-sub">implementation patch</text>
+  <text x="765" y="248" text-anchor="middle" class="node-sub">patch.diff</text>
+
+  <rect x="890" y="185" width="220" height="72" rx="10" fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.5"/>
+  <text x="1000" y="211" text-anchor="middle" class="node-title">workflow_run_verification</text>
+  <text x="1000" y="232" text-anchor="middle" class="node-sub">controlled manifest execution</text>
+  <text x="1000" y="248" text-anchor="middle" class="node-sub">local or SSH runner</text>
+
+  <path d="M 230,221 L 270,221" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M 430,221 L 470,221" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M 640,221 L 680,221" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M 850,221 L 890,221" fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+
+  <rect x="40" y="318" width="1120" height="214" rx="16" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="58" y="346" class="section-title">Verification runner and gates</text>
+  <text x="58" y="367" class="subtitle">The model supplies a manifest; CausaForge executes only configured runners and allowed command prefixes.</text>
+
+  <rect x="80" y="398" width="180" height="86" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="170" y="424" text-anchor="middle" class="node-title">Test Manifest</text>
+  <text x="170" y="445" text-anchor="middle" class="node-sub">user / project / official</text>
+  <text x="170" y="461" text-anchor="middle" class="node-sub">argv, timeout, required</text>
+
+  <rect x="310" y="398" width="185" height="86" rx="10" fill="#f0fdfa" stroke="#99f6e4" stroke-width="1.5"/>
+  <text x="402.5" y="424" text-anchor="middle" class="node-title">Configured Runner</text>
+  <text x="402.5" y="445" text-anchor="middle" class="node-sub">local cwd or SSH target</text>
+  <text x="402.5" y="461" text-anchor="middle" class="node-sub">allowed command prefixes</text>
+
+  <rect x="545" y="398" width="160" height="86" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="625" y="424" text-anchor="middle" class="node-title">Command Results</text>
+  <text x="625" y="445" text-anchor="middle" class="node-sub">exit codes</text>
+  <text x="625" y="461" text-anchor="middle" class="node-sub">stdout / stderr logs</text>
+
+  <polygon points="790,394 870,441 790,488 710,441" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5"/>
+  <text x="790" y="437" text-anchor="middle" class="gate">Required</text>
+  <text x="790" y="454" text-anchor="middle" class="gate">checks pass?</text>
+
+  <rect x="930" y="398" width="170" height="86" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="1015" y="424" text-anchor="middle" class="node-title">Review Gate</text>
+  <text x="1015" y="445" text-anchor="middle" class="node-sub">independent session</text>
+  <text x="1015" y="461" text-anchor="middle" class="node-sub">review passes</text>
+
+  <path d="M 260,441 L 310,441" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <path d="M 495,441 L 545,441" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <path d="M 705,441 L 710,441" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <path d="M 870,441 L 930,441" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <rect x="875" y="418" width="42" height="18" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="896" y="431" text-anchor="middle" class="label">pass</text>
+
+  <rect x="930" y="576" width="170" height="70" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="1015" y="603" text-anchor="middle" class="node-title">Delivery</text>
+  <text x="1015" y="624" text-anchor="middle" class="node-sub">patch consistency</text>
+  <text x="1015" y="640" text-anchor="middle" class="node-sub">complete workflow</text>
+  <path d="M 1015,484 L 1015,576" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+
+  <rect x="545" y="576" width="200" height="86" rx="10" fill="#fef2f2" stroke="#fecaca" stroke-width="1.5"/>
+  <text x="645" y="603" text-anchor="middle" class="node-title">Failure Evidence</text>
+  <text x="645" y="624" text-anchor="middle" class="node-sub">failure signature</text>
+  <text x="645" y="640" text-anchor="middle" class="node-sub">required check failures</text>
+  <text x="645" y="656" text-anchor="middle" class="node-sub">residual risks</text>
+
+  <rect x="80" y="576" width="230" height="86" rx="10" fill="#faf5ff" stroke="#ddd6fe" stroke-width="1.5"/>
+  <text x="195" y="603" text-anchor="middle" class="node-title">Evidence Store</text>
+  <text x="195" y="624" text-anchor="middle" class="node-sub">.workflow/&lt;id&gt;/iterations/000N</text>
+  <text x="195" y="640" text-anchor="middle" class="node-sub">verification-run.json</text>
+  <text x="195" y="656" text-anchor="middle" class="node-sub">latest-run.json and logs</text>
+
+  <path d="M 790,488 L 790,619 L 745,619" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-red)"/>
+  <rect x="803" y="548" width="38" height="18" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="822" y="561" text-anchor="middle" class="label">fail</text>
+  <path d="M 645,662 L 645,684 L 195,684 L 195,662" fill="none" stroke="#9333ea" stroke-width="2" marker-end="url(#arrow-purple)"/>
+  <path d="M 195,576 L 195,520 L 555,520 L 555,257" fill="none" stroke="#9333ea" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-purple)"/>
+  <rect x="324" y="495" width="170" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="409" y="509" text-anchor="middle" class="label">return_to_phase(building)</text>
+  <path d="M 625,484 L 625,576" fill="none" stroke="#6b7280" stroke-width="1.8" marker-end="url(#arrow-gray)"/>
+
+  <rect x="40" y="700" width="1120" height="34" rx="8" fill="#f9fafb" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="65" y1="717" x2="105" y2="717" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="115" y="721" class="small">main phase flow</text>
+  <line x1="250" y1="717" x2="290" y2="717" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="300" y="721" class="small">passing verification</text>
+  <line x1="470" y1="717" x2="510" y2="717" stroke="#dc2626" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-red)"/>
+  <text x="520" y="721" class="small">failed gate</text>
+  <line x1="655" y1="717" x2="695" y2="717" stroke="#9333ea" stroke-width="2" marker-end="url(#arrow-purple)"/>
+  <text x="705" y="721" class="small">repair loop and evidence write</text>
+</svg>
