@@ -1,5 +1,10 @@
 # CausaForge Agent
 
+<p align="center">
+  <strong><kbd>English</kbd></strong>
+  <a href="./README.zh-CN.md"><kbd>简体中文</kbd></a>
+</p>
+
 > [!NOTE]
 > **OpenCode-first, evidence-chain patch delivery.**
 >

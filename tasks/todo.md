@@ -55,6 +55,22 @@
 - 已将 Adapter/Core 节点下移并同步调整箭头与标签，重新渲染 `docs/diagrams/causaforge-architecture.png`。
 - 已把 README 图示视觉检查要求补充进 `tasks/lessons.md`，并保存 before/after PNG、手工视觉检查、SVG/XML、链接、扫描、测试、typecheck、build 和 diff check 证据。
 
+## Stage 11：中英文 README 与语言切换
+
+- [x] 保持 `README.md` 作为 GitHub 默认英文主页
+- [x] 在英文 README 顶部添加 `English / 简体中文` 语言切换入口
+- [x] 新建 `README.zh-CN.md`，完整提供中文 README 内容并保留事实、链接、图示和命令一致性
+- [x] 在中文 README 顶部添加返回英文主页的语言切换入口
+- [x] 验证两份 README 的本地链接、语言切换互链、旧标识扫描、测试、typecheck、build 和 diff check
+- [x] 写入 `.causaforge/evidence/20260716-bilingual-readme/` 证据并创建中文阶段提交
+
+### Stage 11 Review
+
+- `README.md` 保持为默认英文主页，并在顶部提供 `English` 当前态与 `简体中文` 切换按钮。
+- 新增 `README.zh-CN.md` 作为完整简体中文 README，顶部提供返回英文主页的语言切换按钮。
+- 两份 README 保持相同事实边界、安装命令、图示、工具/Agent 表、配置说明、Roadmap 和非目标声明。
+- 验证证据写入 `.causaforge/evidence/20260716-bilingual-readme/`：本地链接、语言切换、旧标识扫描、89 个测试、typecheck、build 和 diff check。
+
 ## Stage 5：真实 OpenCode 工作流验证
 
 - [x] 复现并定位 `opencode debug config` 加载当前插件超时问题
