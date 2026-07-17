@@ -151,7 +151,7 @@ SVG 源文件：[`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaf
 
 SVG 源文件：[`docs/diagrams/causaforge-iterative-agent-loop.svg`](./docs/diagrams/causaforge-iterative-agent-loop.svg)
 
-回修闭环被刻意收窄：只有 `patch-builder` 能修改产品文件，`workflow_run_verification` 只执行配置好的本地或 SSH runner，并且每一轮失败或通过的验证都会保存在 `.workflow/<workflowId>/iterations/<000N>/`。必需检查失败时会记录 failure evidence 并返回 `building`；只有通过的 verification 才能进入 independent review。
+回修闭环被刻意收窄：只有 `patch-builder` 能修改产品文件，`workflow_run_verification` 会先执行 `max_iterations` 上限 guard，再运行配置好的本地或 SSH runner，并且每一轮失败或通过的验证都会保存在 `.workflow/<workflowId>/iterations/<000N>/`。必需检查失败时会记录 failure evidence 并返回 `building`；超过配置上限的 iteration 会在 runner 执行前被拒绝；只有通过的 verification 才能进入 independent review。
 
 ## Agent 阵容
 

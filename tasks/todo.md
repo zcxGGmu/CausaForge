@@ -1,5 +1,20 @@
 # CausaForge 当前执行计划
 
+## Stage 15：多轮迭代次数上限图示纠偏
+
+- [x] 将 `max_iterations` guard 补入多轮 Agent 迭代 SVG/PNG 图，明确超限会在 runner 执行前拒绝
+- [x] 同步更新 README 与 README.zh-CN 的多轮迭代说明，避免用户误以为没有迭代上限
+- [x] 增加 `MAX_ITERATIONS_EXCEEDED` 回归测试，证明超限不会执行验证命令
+- [x] 运行图示渲染/视觉 QA、README 链接、相关测试、typecheck、build、diff check 和严格扫描
+- [x] 写入 `.causaforge/evidence/20260717-iteration-cap-diagram/` 证据并创建中文阶段提交
+
+### Stage 15 Review
+
+- 多轮 Agent 迭代图已新增 `iteration > max_iterations` guard，位置在 `workflow_run_verification` 下方，表达超限会在 runner 执行前拒绝。
+- README 与 README.zh-CN 已同步说明 `workflow_run_verification` 会先执行 `max_iterations` 上限 guard，再运行本地或 SSH runner。
+- 新增 workflow tools 回归测试，覆盖默认上限 5 下第 6 轮触发 `MAX_ITERATIONS_EXCEEDED`，并断言不会调用 command runner。
+- 验证证据写入 `.causaforge/evidence/20260717-iteration-cap-diagram/`：视觉 QA、README 链接、SVG/XML、PNG 渲染、96 个测试、typecheck、build、diff check 和严格扫描均通过。
+
 ## Stage 14：README 多轮 Agent 迭代架构图
 
 - [x] 新增多轮 agent 迭代闭环 SVG/PNG 图，展示 builder、verification runner、failure evidence、回修和 review gate

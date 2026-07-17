@@ -201,6 +201,19 @@ describe("workflow tools", () => {
     })
   })
 
+  test("rejects verification beyond the configured iteration limit before running commands", async () => {
+    const { commandCalls, tools } = await makeTools()
+
+    await expect(tools.workflow_run_verification.execute({
+      workflowId: "wf-001",
+      patchCandidateArtifactId: patchCandidate.artifactId,
+      iteration: 6,
+      manifest,
+      now: timestamp,
+    })).rejects.toThrow("MAX_ITERATIONS_EXCEEDED: 6 > 5")
+    expect(commandCalls).toEqual([])
+  })
+
 
   test("return to phase rejects terminal or forward targets", async () => {
     const { tools } = await makeTools()

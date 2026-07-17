@@ -151,7 +151,7 @@ SVG source: [`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaforge
 
 SVG source: [`docs/diagrams/causaforge-iterative-agent-loop.svg`](./docs/diagrams/causaforge-iterative-agent-loop.svg)
 
-The repair loop is intentionally narrow: only `patch-builder` edits product files, `workflow_run_verification` executes configured local or SSH runners, and every failed or passing run is preserved under `.workflow/<workflowId>/iterations/<000N>/`. A failed required check records failure evidence and returns the workflow to `building`; only a passing verification can advance to independent review.
+The repair loop is intentionally narrow: only `patch-builder` edits product files, `workflow_run_verification` enforces `max_iterations` before executing configured local or SSH runners, and every failed or passing run is preserved under `.workflow/<workflowId>/iterations/<000N>/`. A failed required check records failure evidence and returns the workflow to `building`; an iteration above the configured cap is rejected before runner execution; only a passing verification can advance to independent review.
 
 ## Agent Roster
 
