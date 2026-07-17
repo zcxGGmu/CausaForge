@@ -127,10 +127,17 @@ function createWorkflowOpenCodeHooks(runtime: {
       if (!result.allowed) throw new Error(`WORKFLOW_STOP_GATE_BLOCKED: ${result.message}`)
     },
     "tool.execute.before": async (input, output): Promise<void> => {
-      const state = await findWorkflowForSession(store, input.sessionID) ?? await findSingleActiveWorkflow(store)
-      const request = await createToolPermissionRequest(store, projectRoot, input.tool, state, asRecord(output.args))
-      const result = workflowPlugin.hooks.toolPermission(request)
-      if (!result.allowed) throw new Error(`WORKFLOW_TOOL_PERMISSION_DENIED: ${result.reason}`)
+      try {
+        const state = await findWorkflowForSession(store, input.sessionID) ?? await findSingleActiveWorkflow(store)
+        const request = await createToolPermissionRequest(store, projectRoot, input.tool, state, asRecord(output.args))
+        const result = workflowPlugin.hooks.toolPermission(request)
+        if (!result.allowed) throw new Error(`WORKFLOW_TOOL_PERMISSION_DENIED: ${result.reason}`)
+      } catch (error: unknown) {
+        if (error instanceof Error && error.message.startsWith("WORKFLOW_TOOL_PERMISSION_DENIED")) {
+          throw error
+        }
+        console.warn(`[CausaForge] Permission engine error for ${input.tool}, allowing: ${error instanceof Error ? error.message : String(error)}`)
+      }
     },
     "experimental.session.compacting": async (input, output): Promise<void> => {
       const state = await findWorkflowForSession(store, input.sessionID)
@@ -305,5 +312,16 @@ function extractEditTargetPaths(value: unknown): string[] {
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {}
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as Record<string, unknown>
+  }
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value)
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return parsed as Record<string, unknown>
+      }
+    } catch { /* fall through */ }
+  }
+  return {}
 }

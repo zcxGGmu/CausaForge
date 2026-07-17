@@ -102,6 +102,20 @@ describe("workflow tools", () => {
     expect(status).toMatchObject({ workflowId: "wf-001", phase: "root_cause", missing: ["root-cause"] })
   })
 
+  test("reports the only active workflow when workflowId is omitted", async () => {
+    const { tools } = await makeTools()
+
+    await tools.workflow_start.execute({
+      workflowId: "wf-001",
+      entryMode: "problem-description",
+      now: timestamp,
+    })
+
+    const status = await tools.workflow_status.execute({} as never)
+
+    expect(status).toMatchObject({ workflowId: "wf-001", phase: "root_cause", missing: ["root-cause"] })
+  })
+
   test("records artifacts only when the agent owns that artifact kind", async () => {
     const { baseDir, tools } = await makeTools()
     await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })

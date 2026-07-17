@@ -1,5 +1,22 @@
 # CausaForge 当前执行计划
 
+## Stage 17：OpenCode tool args 与 patch fallback 修正
+
+- [x] 写入回归测试：字符串化 tool args 应被权限 hook 解析
+- [x] 写入回归测试：`workflow_status` 在缺少 workflowId 时解析唯一 active workflow
+- [x] 写入回归测试：patch candidate schema 接受可选 `patchContent` 且 transition 使用 fallback patch 内容
+- [x] 实现五处指定源码修改
+- [x] 运行 `bun run build`、相邻测试、全量测试、typecheck、严格旧身份扫描和 `git diff --check`，并保存证据
+- [x] 记录 Stage 17 review 并创建中文阶段提交
+
+### Stage 17 Review
+
+- `tool.execute.before` 现在解析 JSON 字符串形式的 tool args；真实权限拒绝仍抛出 `WORKFLOW_TOOL_PERMISSION_DENIED`，非权限引擎异常会记录 CausaForge warning 后放行。
+- `PatchCandidateArtifactSchema` 新增可选 nullable `patchContent`，`workflow_transition` 在 implementation patch 文件不可读时会使用该内联内容作为 fallback。
+- `workflow_status` 支持省略 `workflowId` 并自动选择唯一 active workflow；无 active 或多个 active 时会明确报错。
+- Red/Green 证据已保存：目标测试先出现 5 个预期失败，源码修改后目标测试 30 passed。
+- 验证证据写入 `.causaforge/evidence/20260718-opencode-args-patch-fallback/`：`bun run build`、全量测试 101 passed、typecheck、严格旧身份扫描和 `git diff --check` 均通过。
+
 ## Stage 16：blocked 恢复路径与 builder session 记录修正
 
 - [x] 确认 `blocked` phase 可以恢复到 root cause、planning、building、verifying

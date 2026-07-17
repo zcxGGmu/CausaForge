@@ -340,6 +340,39 @@ describe("workflow rollback integration", () => {
     expect(await store.readWorkflow("wf-001")).toMatchObject({ phase: "delivering", status: "active" })
   })
 
+  test("completes when the implementation patch is stored inline on the patch candidate", async () => {
+    const { baseDir, plugin, store } = await createHarness()
+    const { rootCause, patchPlan, patchCandidate, verification, review, delivery } = makeArtifactChain()
+    const patchCandidateWithContent = { ...patchCandidate, patchContent: implementationPatch }
+
+    await store.initializeWorkflow(stateIn("delivering", {
+      rootCauseArtifactId: rootCause.artifactId,
+      patchPlanArtifactId: patchPlan.artifactId,
+      patchCandidateArtifactId: patchCandidate.artifactId,
+      verificationArtifactId: verification.artifactId,
+      reviewArtifactId: review.artifactId,
+      deliveryArtifactId: delivery.artifactId,
+    }))
+    await store.writeArtifact("wf-001", "root-cause", rootCause)
+    await store.writeArtifact("wf-001", "patch-plan", patchPlan)
+    await store.writeArtifact("wf-001", "patch-candidate", patchCandidateWithContent)
+    await store.writeArtifact("wf-001", "verification", verification)
+    await store.writeArtifact("wf-001", "review", review)
+    await store.writeArtifact("wf-001", "delivery", delivery)
+    const workflowDir = getWorkflowDir(baseDir, "wf-001")
+    await fs.mkdir(path.join(workflowDir, "delivery"), { recursive: true })
+    await fs.writeFile(path.join(workflowDir, "delivery", "patch.diff"), implementationPatch)
+
+    const completed = await plugin.tools.workflow_complete.execute({
+      workflowId: "wf-001",
+      requestedByAgent: "delivery-coordinator",
+      sessionId: "session-delivery-001",
+      now: finalTimestamp,
+    })
+
+    expect(completed).toMatchObject({ phase: "completed", status: "completed" })
+  })
+
   test("rejects spoofed transition artifacts that were not recorded in the artifact store", async () => {
     const { plugin, store } = await createHarness()
     const { rootCause, patchPlan } = makeArtifactChain()

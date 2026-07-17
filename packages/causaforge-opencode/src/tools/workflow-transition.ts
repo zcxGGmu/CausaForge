@@ -23,6 +23,7 @@ export function createWorkflowTransitionTool(deps: WorkflowToolDeps): WorkflowTo
       const state = await deps.store.readWorkflow(input.workflowId)
       const artifacts = await readStoredArtifactChain(deps.store, input.workflowId)
       const implementationPatchContent = await readPatchContent(deps.cwd, input.workflowId, artifacts.patchCandidate?.patchPath)
+        ?? artifacts.patchCandidate?.patchContent ?? undefined
       const deliveryPatchContent = await readPatchContent(deps.cwd, input.workflowId, artifacts.delivery?.patchPath)
       const result = evaluateTransitionGuard({
         state,

@@ -6,7 +6,15 @@ export function createWorkflowStatusTool(deps: WorkflowToolDeps): WorkflowTool<W
     name: "workflow_status",
     description: "Read workflow phase and missing gates.",
     async execute(input) {
-      const state = await deps.store.readWorkflow(input.workflowId)
+      let workflowId = input.workflowId
+      if (!workflowId) {
+        const workflows = await deps.store.listWorkflows()
+        const active = workflows.filter((w) => w.status === "active")
+        if (active.length === 0) throw new Error("No active workflow found")
+        if (active.length > 1) throw new Error(`Multiple active workflows (${active.length}); specify workflowId`)
+        workflowId = active[0].workflowId
+      }
+      const state = await deps.store.readWorkflow(workflowId)
       return {
         workflowId: state.workflowId,
         phase: state.phase,

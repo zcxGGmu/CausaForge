@@ -82,10 +82,37 @@ describe("OpenCode plugin module hooks", () => {
       )).resolves.toBeUndefined()
 
       await expect(hooks["tool.execute.before"]!(
+        { tool: "edit", sessionID: "session-builder-001", callID: "call-string-args" },
+        { args: JSON.stringify({ path: "src/migrate.ts" }) },
+      )).resolves.toBeUndefined()
+
+      await expect(hooks["tool.execute.before"]!(
         { tool: "edit", sessionID: "session-builder-001", callID: "call-rejected" },
         { args: { path: "src/extra.ts" } },
       )).rejects.toThrow("PLAN_SCOPE_VIOLATION")
     } finally {
+      await fs.rm(project, { recursive: true, force: true })
+    }
+  })
+
+  test("allows tool execution when permission hook input shape fails", async () => {
+    const project = await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-plugin-module-"))
+    const warnings: string[] = []
+    const originalWarn = console.warn
+    console.warn = ((message?: unknown) => {
+      warnings.push(String(message))
+    }) as typeof console.warn
+    try {
+      const hooks = await createHooks(project)
+
+      await expect(hooks["tool.execute.before"]!(
+        { tool: "edit", sessionID: "session-missing-workflow", callID: "call-engine-error" },
+        undefined as never,
+      )).resolves.toBeUndefined()
+
+      expect(warnings[0]).toContain("[CausaForge] Permission engine error for edit, allowing:")
+    } finally {
+      console.warn = originalWarn
       await fs.rm(project, { recursive: true, force: true })
     }
   })

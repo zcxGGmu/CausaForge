@@ -9,6 +9,7 @@ export const PlanDeviationSchema = z.object({
 export const PatchCandidateArtifactSchema = ArtifactBaseSchema.extend({
   patchPlanArtifactId: NonEmptyStringSchema,
   modifiedFiles: z.array(NonEmptyStringSchema).min(1),
+  patchContent: NonEmptyStringSchema.nullable().optional(),
   patchPath: NonEmptyStringSchema,
   patchSummary: NonEmptyStringSchema,
   planDeviations: z.array(PlanDeviationSchema),

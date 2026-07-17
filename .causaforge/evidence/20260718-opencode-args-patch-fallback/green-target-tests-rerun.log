@@ -1,0 +1,44 @@
+bun test v1.3.14 (0d9b296a)
+
+packages/causaforge-opencode/src/workflow.rollback.integration.test.ts:
+(pass) workflow rollback integration > runs iterative verification until the patch passes [25.29ms]
+(pass) workflow rollback integration > returns from failed verification to building [2.06ms]
+(pass) workflow rollback integration > review blocking returns to building and requires a new verification pass [2.09ms]
+(pass) workflow rollback integration > rejects completion when delivery patch differs from implementation patch [2.24ms]
+(pass) workflow rollback integration > rejects completion when real patch files are missing [1.24ms]
+(pass) workflow rollback integration > completes when the implementation patch is stored inline on the patch candidate [1.26ms]
+(pass) workflow rollback integration > rejects spoofed transition artifacts that were not recorded in the artifact store [0.58ms]
+
+packages/causaforge-opencode/src/opencode-plugin-module.test.ts:
+(pass) OpenCode plugin module hooks > uses the single active workflow for building-phase tool permission fallback [10.87ms]
+(pass) OpenCode plugin module hooks > allows tool execution when permission hook input shape fails [1.25ms]
+
+packages/causaforge-opencode/src/tools/tools.test.ts:
+(pass) workflow tools > registers the deterministic workflow tool surface [0.49ms]
+(pass) workflow tools > starts a workflow and reports status [0.76ms]
+(pass) workflow tools > reports the only active workflow when workflowId is omitted [0.69ms]
+(pass) workflow tools > records artifacts only when the agent owns that artifact kind [1.11ms]
+(pass) workflow tools > rejects path traversal workflow IDs [0.17ms]
+(pass) workflow tools > captures git diff through the injected runner [1.39ms]
+(pass) workflow tools > runs verification manifests and preserves iteration history [6.82ms]
+(pass) workflow tools > rejects verification beyond the configured iteration limit before running commands [0.24ms]
+(pass) workflow tools > return to phase rejects terminal or forward targets [0.63ms]
+(pass) workflow tools > fails capture when git fails or diff is empty [0.25ms]
+
+packages/causaforge-core/src/schemas/schemas.test.ts:
+(pass) workflow artifact schemas > accepts minimal valid workflow state and six artifacts [0.25ms]
+(pass) workflow artifact schemas > accepts inline patch content on patch candidates [0.05ms]
+(pass) workflow artifact schemas > rejects incomplete common fields and artifact references [0.67ms]
+(pass) workflow artifact schemas > requires passing verification evidence [0.19ms]
+(pass) workflow artifact schemas > requires passing verification runs to have successful required commands [0.21ms]
+(pass) workflow artifact schemas > validates verification criterion results against the root cause [0.68ms]
+(pass) workflow artifact schemas > requires approved plan deviations before verification [0.22ms]
+(pass) workflow artifact schemas > rejects passing reviews with blocking findings [0.11ms]
+(pass) workflow artifact schemas > requires every upstream artifact for complete delivery [0.68ms]
+(pass) workflow artifact schemas > accepts only explicit workflow artifact references [0.14ms]
+(pass) workflow artifact schemas > keeps workflow terminal status, phase, and timestamps consistent [0.23ms]
+
+ 30 pass
+ 0 fail
+ 101 expect() calls
+Ran 30 tests across 4 files. [337.00ms]

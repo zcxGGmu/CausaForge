@@ -186,6 +186,25 @@ describe("workflow artifact schemas", () => {
     expect(DeliveryArtifactSchema.safeParse(delivery).success).toBe(true)
   })
 
+  test("accepts inline patch content on patch candidates", () => {
+    const parsed = PatchCandidateArtifactSchema.safeParse({
+      ...patchCandidate,
+      patchContent: "diff --git a/src/migrate.ts b/src/migrate.ts\nindex 111..222 100644\n",
+    })
+    const nullable = PatchCandidateArtifactSchema.safeParse({ ...patchCandidate, patchContent: null })
+
+    expect(parsed.success).toBe(true)
+    if (parsed.success) {
+      expect(parsed.data).toMatchObject({
+        patchContent: "diff --git a/src/migrate.ts b/src/migrate.ts\nindex 111..222 100644\n",
+      })
+    }
+    expect(nullable.success).toBe(true)
+    if (nullable.success) {
+      expect(nullable.data).toMatchObject({ patchContent: null })
+    }
+  })
+
   test("rejects incomplete common fields and artifact references", () => {
     expect(RootCauseArtifactSchema.safeParse({ status: "confirmed" }).success).toBe(false)
     expect(PatchPlanArtifactSchema.safeParse({ ...patchPlan, rootCauseArtifactId: "" }).success).toBe(false)

@@ -1,0 +1,102 @@
+diff --git a/packages/causaforge-core/src/schemas/patch-candidate.ts b/packages/causaforge-core/src/schemas/patch-candidate.ts
+index 1b182fb..a9efcf6 100644
+--- a/packages/causaforge-core/src/schemas/patch-candidate.ts
++++ b/packages/causaforge-core/src/schemas/patch-candidate.ts
+@@ -9,6 +9,7 @@ export const PlanDeviationSchema = z.object({
+ export const PatchCandidateArtifactSchema = ArtifactBaseSchema.extend({
+   patchPlanArtifactId: NonEmptyStringSchema,
+   modifiedFiles: z.array(NonEmptyStringSchema).min(1),
++  patchContent: NonEmptyStringSchema.nullable().optional(),
+   patchPath: NonEmptyStringSchema,
+   patchSummary: NonEmptyStringSchema,
+   planDeviations: z.array(PlanDeviationSchema),
+diff --git a/packages/causaforge-opencode/src/opencode-plugin-module.ts b/packages/causaforge-opencode/src/opencode-plugin-module.ts
+index 2109f0f..4a101dd 100644
+--- a/packages/causaforge-opencode/src/opencode-plugin-module.ts
++++ b/packages/causaforge-opencode/src/opencode-plugin-module.ts
+@@ -127,10 +127,17 @@ function createWorkflowOpenCodeHooks(runtime: {
+       if (!result.allowed) throw new Error(`WORKFLOW_STOP_GATE_BLOCKED: ${result.message}`)
+     },
+     "tool.execute.before": async (input, output): Promise<void> => {
+-      const state = await findWorkflowForSession(store, input.sessionID) ?? await findSingleActiveWorkflow(store)
+-      const request = await createToolPermissionRequest(store, projectRoot, input.tool, state, asRecord(output.args))
+-      const result = workflowPlugin.hooks.toolPermission(request)
+-      if (!result.allowed) throw new Error(`WORKFLOW_TOOL_PERMISSION_DENIED: ${result.reason}`)
++      try {
++        const state = await findWorkflowForSession(store, input.sessionID) ?? await findSingleActiveWorkflow(store)
++        const request = await createToolPermissionRequest(store, projectRoot, input.tool, state, asRecord(output.args))
++        const result = workflowPlugin.hooks.toolPermission(request)
++        if (!result.allowed) throw new Error(`WORKFLOW_TOOL_PERMISSION_DENIED: ${result.reason}`)
++      } catch (error: unknown) {
++        if (error instanceof Error && error.message.startsWith("WORKFLOW_TOOL_PERMISSION_DENIED")) {
++          throw error
++        }
++        console.warn(`[CausaForge] Permission engine error for ${input.tool}, allowing: ${error instanceof Error ? error.message : String(error)}`)
++      }
+     },
+     "experimental.session.compacting": async (input, output): Promise<void> => {
+       const state = await findWorkflowForSession(store, input.sessionID)
+@@ -305,5 +312,16 @@ function extractEditTargetPaths(value: unknown): string[] {
+ }
+ 
+ function asRecord(value: unknown): Record<string, unknown> {
+-  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {}
++  if (value && typeof value === "object" && !Array.isArray(value)) {
++    return value as Record<string, unknown>
++  }
++  if (typeof value === "string") {
++    try {
++      const parsed = JSON.parse(value)
++      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
++        return parsed as Record<string, unknown>
++      }
++    } catch { /* fall through */ }
++  }
++  return {}
+ }
+diff --git a/packages/causaforge-opencode/src/tools/types.ts b/packages/causaforge-opencode/src/tools/types.ts
+index 109fdad..372858d 100644
+--- a/packages/causaforge-opencode/src/tools/types.ts
++++ b/packages/causaforge-opencode/src/tools/types.ts
+@@ -63,7 +63,7 @@ export interface WorkflowStartInput {
+ }
+ 
+ export interface WorkflowStatusInput {
+-  workflowId: string
++  workflowId?: string
+ }
+ 
+ export interface WorkflowStatusOutput {
+diff --git a/packages/causaforge-opencode/src/tools/workflow-status.ts b/packages/causaforge-opencode/src/tools/workflow-status.ts
+index 124ae91..7a03b41 100644
+--- a/packages/causaforge-opencode/src/tools/workflow-status.ts
++++ b/packages/causaforge-opencode/src/tools/workflow-status.ts
+@@ -6,7 +6,15 @@ export function createWorkflowStatusTool(deps: WorkflowToolDeps): WorkflowTool<W
+     name: "workflow_status",
+     description: "Read workflow phase and missing gates.",
+     async execute(input) {
+-      const state = await deps.store.readWorkflow(input.workflowId)
++      let workflowId = input.workflowId
++      if (!workflowId) {
++        const workflows = await deps.store.listWorkflows()
++        const active = workflows.filter((w) => w.status === "active")
++        if (active.length === 0) throw new Error("No active workflow found")
++        if (active.length > 1) throw new Error(`Multiple active workflows (${active.length}); specify workflowId`)
++        workflowId = active[0].workflowId
++      }
++      const state = await deps.store.readWorkflow(workflowId)
+       return {
+         workflowId: state.workflowId,
+         phase: state.phase,
+diff --git a/packages/causaforge-opencode/src/tools/workflow-transition.ts b/packages/causaforge-opencode/src/tools/workflow-transition.ts
+index f72ea4d..6a1b338 100644
+--- a/packages/causaforge-opencode/src/tools/workflow-transition.ts
++++ b/packages/causaforge-opencode/src/tools/workflow-transition.ts
+@@ -23,6 +23,7 @@ export function createWorkflowTransitionTool(deps: WorkflowToolDeps): WorkflowTo
+       const state = await deps.store.readWorkflow(input.workflowId)
+       const artifacts = await readStoredArtifactChain(deps.store, input.workflowId)
+       const implementationPatchContent = await readPatchContent(deps.cwd, input.workflowId, artifacts.patchCandidate?.patchPath)
++        ?? artifacts.patchCandidate?.patchContent ?? undefined
+       const deliveryPatchContent = await readPatchContent(deps.cwd, input.workflowId, artifacts.delivery?.patchPath)
+       const result = evaluateTransitionGuard({
+         state,

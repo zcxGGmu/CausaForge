@@ -63,7 +63,7 @@ export interface WorkflowStartInput {
 }
 
 export interface WorkflowStatusInput {
-  workflowId: string
+  workflowId?: string
 }
 
 export interface WorkflowStatusOutput {

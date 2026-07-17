@@ -1,0 +1,136 @@
+bun test v1.3.14 (0d9b296a)
+
+packages/causaforge-opencode/src/workflow.rollback.integration.test.ts:
+(pass) workflow rollback integration > runs iterative verification until the patch passes [28.58ms]
+(pass) workflow rollback integration > returns from failed verification to building [2.11ms]
+(pass) workflow rollback integration > review blocking returns to building and requires a new verification pass [2.28ms]
+(pass) workflow rollback integration > rejects completion when delivery patch differs from implementation patch [2.67ms]
+(pass) workflow rollback integration > rejects completion when real patch files are missing [1.45ms]
+37 |         allowPlanDeviation: input.allowPlanDeviation ?? deps.config.allow_plan_deviation,
+38 |         implementationPatchContent,
+39 |         deliveryPatchContent,
+40 |         now: input.now,
+41 |       })
+42 |       if (!result.ok) throw new Error(`${result.error.code}: ${result.error.remediation}`)
+                                     ^
+error: DELIVERY_INCOMPLETE: Delivery and implementation patch contents are required before closing the workflow.
+      at execute (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-opencode/src/tools/workflow-transition.ts:42:33)
+(fail) workflow rollback integration > completes when the implementation patch is stored inline on the patch candidate [2.76ms]
+(pass) workflow rollback integration > rejects spoofed transition artifacts that were not recorded in the artifact store [0.63ms]
+
+packages/causaforge-opencode/src/opencode-plugin-module.test.ts:
+82 |       )).resolves.toBeUndefined()
+83 | 
+84 |       await expect(hooks["tool.execute.before"]!(
+85 |         { tool: "edit", sessionID: "session-builder-001", callID: "call-string-args" },
+86 |         { args: JSON.stringify({ path: "src/migrate.ts" }) },
+87 |       )).resolves.toBeUndefined()
+                       ^
+error: 
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-opencode/src/opencode-plugin-module.test.ts:87:19)
+(fail) OpenCode plugin module hooks > uses the single active workflow for building-phase tool permission fallback [15.37ms]
+106 |       const hooks = await createHooks(project)
+107 | 
+108 |       await expect(hooks["tool.execute.before"]!(
+109 |         { tool: "edit", sessionID: "session-missing-workflow", callID: "call-engine-error" },
+110 |         { args: { path: "src/migrate.ts" } },
+111 |       )).resolves.toBeUndefined()
+                        ^
+error: 
+
+Expected promise that resolves
+Received promise that rejected: Promise { <rejected> }
+
+      at <anonymous> (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-opencode/src/opencode-plugin-module.test.ts:111:19)
+(fail) OpenCode plugin module hooks > allows tool execution when permission context lookup fails [0.79ms]
+
+packages/causaforge-opencode/src/tools/tools.test.ts:
+(pass) workflow tools > registers the deterministic workflow tool surface [0.52ms]
+(pass) workflow tools > starts a workflow and reports status [0.88ms]
+23 |   assertSafeWorkflowId(workflowId)
+24 |   return path.join(baseDir, ARTIFACT_ROOT_DIR, workflowId)
+25 | }
+26 | 
+27 | export function getWorkflowStatePath(baseDir: string, workflowId: string): string {
+28 |   return path.join(getWorkflowDir(baseDir, workflowId), "workflow.json")
+                        ^
+TypeError: The "paths[2]" property must be of type string, got undefined
+ code: "ERR_INVALID_ARG_TYPE"
+
+      at getWorkflowStatePath (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-core/src/artifacts/paths.ts:28:20)
+      at readWorkflow (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-core/src/artifacts/store.ts:59:36)
+      at execute (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-opencode/src/tools/workflow-status.ts:9:38)
+      at <anonymous> (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-opencode/src/tools/tools.test.ts:114:48)
+(fail) workflow tools > reports the only active workflow when workflowId is omitted [0.76ms]
+(pass) workflow tools > records artifacts only when the agent owns that artifact kind [1.34ms]
+(pass) workflow tools > rejects path traversal workflow IDs [0.24ms]
+(pass) workflow tools > captures git diff through the injected runner [1.69ms]
+(pass) workflow tools > runs verification manifests and preserves iteration history [8.40ms]
+(pass) workflow tools > rejects verification beyond the configured iteration limit before running commands [0.31ms]
+(pass) workflow tools > return to phase rejects terminal or forward targets [0.71ms]
+(pass) workflow tools > fails capture when git fails or diff is empty [0.31ms]
+
+packages/causaforge-core/src/schemas/schemas.test.ts:
+(pass) workflow artifact schemas > accepts minimal valid workflow state and six artifacts [0.31ms]
+193 |     })
+194 |     const nullable = PatchCandidateArtifactSchema.safeParse({ ...patchCandidate, patchContent: null })
+195 | 
+196 |     expect(parsed.success).toBe(true)
+197 |     if (parsed.success) {
+198 |       expect(parsed.data).toMatchObject({
+                                ^
+error: expect(received).toMatchObject(expected)
+
+  {
+-   "patchContent": 
+- "diff --git a/src/migrate.ts b/src/migrate.ts
+- index 111..222 100644
+- "
+- ,
++   "artifactId": "patch-candidate-001",
++   "createdAt": "2026-07-13T00:00:00.000Z",
++   "implementationNotes": [
++     "Added the field to the normalized object.",
++   ],
++   "modifiedFiles": [
++     "src/migrate.ts",
++   ],
++   "patchPath": "implementation/patch.diff",
++   "patchPlanArtifactId": "patch-plan-001",
++   "patchSummary": "Preserve the legacy field during normalization.",
++   "planDeviations": [],
++   "schemaVersion": "1.0",
++   "status": "ready_for_verification",
++   "workflowId": "wf-001",
+  }
+
+- Expected  - 5
++ Received  + 15
+
+      at <anonymous> (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-core/src/schemas/schemas.test.ts:198:27)
+(fail) workflow artifact schemas > accepts inline patch content on patch candidates [2.93ms]
+(pass) workflow artifact schemas > rejects incomplete common fields and artifact references [1.27ms]
+(pass) workflow artifact schemas > requires passing verification evidence [0.21ms]
+(pass) workflow artifact schemas > requires passing verification runs to have successful required commands [0.18ms]
+(pass) workflow artifact schemas > validates verification criterion results against the root cause [0.76ms]
+(pass) workflow artifact schemas > requires approved plan deviations before verification [0.41ms]
+(pass) workflow artifact schemas > rejects passing reviews with blocking findings [0.15ms]
+(pass) workflow artifact schemas > requires every upstream artifact for complete delivery [0.60ms]
+(pass) workflow artifact schemas > accepts only explicit workflow artifact references [0.15ms]
+(pass) workflow artifact schemas > keeps workflow terminal status, phase, and timestamps consistent [0.24ms]
+
+5 tests failed:
+(fail) workflow rollback integration > completes when the implementation patch is stored inline on the patch candidate [2.76ms]
+(fail) OpenCode plugin module hooks > uses the single active workflow for building-phase tool permission fallback [15.37ms]
+(fail) OpenCode plugin module hooks > allows tool execution when permission context lookup fails [0.79ms]
+(fail) workflow tools > reports the only active workflow when workflowId is omitted [0.76ms]
+(fail) workflow artifact schemas > accepts inline patch content on patch candidates [2.93ms]
+
+ 25 pass
+ 5 fail
+ 93 expect() calls
+Ran 30 tests across 4 files. [291.00ms]
