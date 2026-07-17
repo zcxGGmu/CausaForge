@@ -13,7 +13,7 @@ const ALLOWED_TRANSITIONS: Readonly<Record<WorkflowPhase, ReadonlySet<WorkflowPh
   reviewing: transitionSet("building", "verifying", "delivering", "blocked"),
   delivering: transitionSet("reviewing", "completed", "blocked"),
   completed: transitionSet(),
-  blocked: transitionSet(),
+  blocked: transitionSet("root_cause", "planning", "building", "verifying"),
 })
 
 export class WorkflowTransitionError extends Error {

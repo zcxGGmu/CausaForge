@@ -1,0 +1,25 @@
+bun test v1.3.14 (0d9b296a)
+
+packages/causaforge-core/src/transitions.test.ts:
+(pass) workflow transitions > matches the complete allowed transition matrix [2.51ms]
+(pass) workflow transitions > keeps completed terminal while blocked can recover to active phases [0.06ms]
+(pass) workflow transitions > allows imported root cause reports to enter planning structurally [0.01ms]
+(pass) workflow transitions > requires review failures to return through building [0.01ms]
+(pass) workflow transitions > throws a structured error for invalid transitions [2.07ms]
+(pass) workflow transitions > accepts allowed transitions without returning a value [0.28ms]
+
+packages/causaforge-core/src/guards/transition-guard.test.ts:
+(pass) workflow transition guard > rejects root cause to planning without a root cause artifact [3.78ms]
+(pass) workflow transition guard > rejects patch plans that reference the wrong root cause artifact [0.05ms]
+(pass) workflow transition guard > records the builder session when entering building [3.54ms]
+(pass) workflow transition guard > rejects modified files outside the approved plan when deviations are disabled [0.08ms]
+(pass) workflow transition guard > rejects reviewer sessions that match the builder session [2.05ms]
+(pass) workflow transition guard > rejects reviewing when verification did not pass [0.04ms]
+(pass) workflow transition guard > rejects completion when delivery patch content differs from implementation patch content [0.05ms]
+(pass) workflow transition guard > rejects completion when patch contents are missing [0.04ms]
+(pass) workflow transition guard > returns the next workflow state when completion gates pass [0.15ms]
+
+ 15 pass
+ 0 fail
+ 114 expect() calls
+Ran 15 tests across 2 files. [246.00ms]

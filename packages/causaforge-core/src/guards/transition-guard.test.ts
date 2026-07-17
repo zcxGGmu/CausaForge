@@ -133,6 +133,24 @@ describe("workflow transition guard", () => {
     expect(result).toMatchObject({ ok: false, error: { code: "ARTIFACT_REFERENCE_MISMATCH" } })
   })
 
+  test("records the builder session when entering building", () => {
+    const result = evaluateTransitionGuard({
+      state: stateIn("planning", { rootCauseArtifactId: rootCause.artifactId }),
+      request: request("planning", "building", "session-builder-001"),
+      artifacts: { rootCause, patchPlan },
+      now: nextTimestamp,
+    })
+
+    expect(result).toMatchObject({
+      ok: true,
+      nextState: {
+        phase: "building",
+        builderSessionId: "session-builder-001",
+        updatedAt: nextTimestamp,
+      },
+    })
+  })
+
   test("rejects modified files outside the approved plan when deviations are disabled", () => {
     const result = evaluateTransitionGuard({
       state: stateIn("building", {

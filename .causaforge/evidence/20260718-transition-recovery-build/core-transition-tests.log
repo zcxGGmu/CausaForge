@@ -1,0 +1,50 @@
+bun test v1.3.14 (0d9b296a)
+
+packages/causaforge-core/src/transitions.test.ts:
+33 | 
+34 | describe("workflow transitions", () => {
+35 |   test("matches the complete allowed transition matrix", () => {
+36 |     for (const from of WORKFLOW_PHASES) {
+37 |       for (const to of WORKFLOW_PHASES) {
+38 |         expect(canTransition(from, to), edge(from, to)).toBe(ALLOWED_EDGES.has(edge(from, to)))
+                                                             ^
+error: blocked->root_cause
+
+Expected: false
+Received: true
+
+      at <anonymous> (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-core/src/transitions.test.ts:38:57)
+(fail) workflow transitions > matches the complete allowed transition matrix [5.18ms]
+41 |   })
+42 | 
+43 |   test("keeps completed and blocked terminal", () => {
+44 |     for (const to of WORKFLOW_PHASES) {
+45 |       expect(canTransition("completed", to), edge("completed", to)).toBe(false)
+46 |       expect(canTransition("blocked", to), edge("blocked", to)).toBe(false)
+                                                                     ^
+error: blocked->root_cause
+
+Expected: false
+Received: true
+
+      at <anonymous> (/Users/zq/Desktop/ai-projs/posp/CausaForge/packages/causaforge-core/src/transitions.test.ts:46:65)
+(fail) workflow transitions > keeps completed and blocked terminal [1.01ms]
+(pass) workflow transitions > allows imported root cause reports to enter planning structurally [0.03ms]
+(pass) workflow transitions > requires review failures to return through building [0.02ms]
+(pass) workflow transitions > throws a structured error for invalid transitions [1.47ms]
+(pass) workflow transitions > accepts allowed transitions without returning a value [0.36ms]
+
+packages/causaforge-core/src/guards/transition-guard.test.ts:
+(pass) workflow transition guard > rejects root cause to planning without a root cause artifact [5.00ms]
+(pass) workflow transition guard > rejects patch plans that reference the wrong root cause artifact [0.04ms]
+(pass) workflow transition guard > rejects modified files outside the approved plan when deviations are disabled [0.11ms]
+(pass) workflow transition guard > rejects reviewer sessions that match the builder session [5.73ms]
+(pass) workflow transition guard > rejects reviewing when verification did not pass [0.05ms]
+(pass) workflow transition guard > rejects completion when delivery patch content differs from implementation patch content [0.04ms]
+(pass) workflow transition guard > rejects completion when patch contents are missing [0.03ms]
+(pass) workflow transition guard > returns the next workflow state when completion gates pass [2.36ms]
+
+ 12 pass
+ 2 fail
+ 93 expect() calls
+Ran 14 tests across 2 files. [79.00ms]

@@ -210,7 +210,9 @@ function buildNextState(input: TransitionGuardInput, artifacts: WorkflowArtifact
       ...input.state.artifactRefs,
       ...collectArtifactRefs(artifacts),
     },
-    builderSessionId: targetPhase === "verifying" ? input.request.sessionId : input.state.builderSessionId,
+    builderSessionId: targetPhase === "building" ? input.request.sessionId
+                    : targetPhase === "verifying" ? input.request.sessionId
+                    : input.state.builderSessionId,
     reviewerSessionId: targetPhase === "reviewing" ? input.request.sessionId : input.state.reviewerSessionId,
     updatedAt: now,
     completedAt: targetPhase === "completed" ? now : null,

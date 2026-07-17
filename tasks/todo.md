@@ -1,5 +1,19 @@
 # CausaForge 当前执行计划
 
+## Stage 16：blocked 恢复路径与 builder session 记录修正
+
+- [x] 确认 `blocked` phase 可以恢复到 root cause、planning、building、verifying
+- [x] 确认进入 building / verifying 时都会绑定当前 builder session
+- [x] 运行 `bun run build` 并保存验证证据
+- [x] 记录 Stage 16 review
+
+### Stage 16 Review
+
+- `blocked` transition matrix 已允许恢复到 `root_cause`、`planning`、`building`、`verifying`，仍禁止恢复到 reviewing、delivering、completed 或 blocked 自身。
+- `buildNextState` 现在在进入 `building` 与 `verifying` 时都记录当前请求 session 为 `builderSessionId`，避免 building 阶段缺少可信 builder session。
+- 相邻测试首次运行暴露旧断言仍将 `blocked` 当终态；已同步更新 transition matrix 测试，并新增 entering building 的 builder session 回归测试。
+- 验证证据写入 `.causaforge/evidence/20260718-transition-recovery-build/`：`bun run build`、相邻 core 测试、全量测试、typecheck、严格旧身份扫描和 `git diff --check` 均通过。
+
 ## Stage 15：多轮迭代次数上限图示纠偏
 
 - [x] 将 `max_iterations` guard 补入多轮 Agent 迭代 SVG/PNG 图，明确超限会在 runner 执行前拒绝

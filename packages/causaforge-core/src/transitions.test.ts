@@ -25,6 +25,10 @@ const ALLOWED_EDGES = new Set<string>([
   "delivering->reviewing",
   "delivering->completed",
   "delivering->blocked",
+  "blocked->root_cause",
+  "blocked->planning",
+  "blocked->building",
+  "blocked->verifying",
 ])
 
 function edge(from: WorkflowPhase, to: WorkflowPhase): string {
@@ -40,11 +44,19 @@ describe("workflow transitions", () => {
     }
   })
 
-  test("keeps completed and blocked terminal", () => {
+  test("keeps completed terminal while blocked can recover to active phases", () => {
     for (const to of WORKFLOW_PHASES) {
       expect(canTransition("completed", to), edge("completed", to)).toBe(false)
-      expect(canTransition("blocked", to), edge("blocked", to)).toBe(false)
     }
+
+    expect(canTransition("blocked", "root_cause")).toBe(true)
+    expect(canTransition("blocked", "planning")).toBe(true)
+    expect(canTransition("blocked", "building")).toBe(true)
+    expect(canTransition("blocked", "verifying")).toBe(true)
+    expect(canTransition("blocked", "reviewing")).toBe(false)
+    expect(canTransition("blocked", "delivering")).toBe(false)
+    expect(canTransition("blocked", "completed")).toBe(false)
+    expect(canTransition("blocked", "blocked")).toBe(false)
   })
 
   test("allows imported root cause reports to enter planning structurally", () => {
