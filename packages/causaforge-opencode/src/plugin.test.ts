@@ -5,6 +5,7 @@ import { createWorkflowPlugin } from "./plugin"
 const workflowToolNames = [
   "workflow_start",
   "workflow_status",
+  "workflow_import_root_cause_blueprint",
   "workflow_record_artifact",
   "workflow_validate_artifact",
   "workflow_capture_diff",

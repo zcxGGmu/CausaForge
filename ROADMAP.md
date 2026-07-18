@@ -9,7 +9,7 @@
 ## 已完成
 
 - 建立 `@causaforge/core`：workflow phase、artifact schema、permission guard、transition guard。
-- 建立 `@causaforge/opencode-adapter`：七个规范化 workflow agents、九个确定性 workflow tools、生产 Hook 组装。
+- 建立 `@causaforge/opencode-adapter`：七个规范化 workflow agents、十个确定性 workflow tools、生产 Hook 组装。
 - 将 root package 收敛为 CausaForge-only：只保留核心 workspace、最小 CLI、最小构建脚本。
 
 ## 下一步

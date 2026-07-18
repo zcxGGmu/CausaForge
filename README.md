@@ -66,6 +66,7 @@ CausaForge is currently a source-first OpenCode plugin. Build it locally, then p
 | :--- | :--- | :--- |
 | Build from source | `bun install --ignore-scripts && bun run build` | `dist/index.js`, `dist/index.d.ts`, `dist/cli.js` |
 | Register in a project | add `file://<repo>/dist/index.js` to `.opencode/opencode.json` | OpenCode loads plugin id `causaforge-agent` |
+| Import an Agent3 blueprint | `./bin/causaforge.js import-root-cause --source <folder> --start` | `.workflow/<workflowId>/root-cause/` |
 | Validate before use | `bun run test && bun run typecheck && bun run build` | package tests, type safety, and build output |
 
 ### Source Setup
@@ -98,6 +99,20 @@ printf '{\n  "plugin": ["%s"]\n}\n' "$PLUGIN_PATH" > .opencode/opencode.json
 
 Run OpenCode after building. The plugin registers the workflow agents, workflow tools, and hooks from the compiled entrypoint.
 
+### Agent3 RootCauseBlueprint Handoff
+
+Agent3 should output one folder per RootCauseBlueprint, with a `manifest.json` at the folder root. After the user chooses a blueprint in Agent3, Agent3 should call CausaForge automatically:
+
+```bash
+./bin/causaforge.js import-root-cause \
+  --cwd /path/to/product-project \
+  --source /path/to/root-cause-blueprint-folder \
+  --workflow-id wf-bp-001 \
+  --start
+```
+
+CausaForge validates the manifest and referenced files, archives the original folder under `.workflow/<workflowId>/root-cause/source/`, writes `.workflow/<workflowId>/root-cause/root-cause.json`, and starts the workflow in `planning`. Agent3 must not write `.workflow` directly.
+
 ### For LLM Agents
 
 Paste this into an agent that has shell access to the repository:
@@ -120,7 +135,7 @@ Read https://raw.githubusercontent.com/zcxGGmu/CausaForge/refs/heads/main/README
 | :--- | :--- | :--- |
 | Evidence-chain workflow | Splits patch delivery into root cause, plan, implementation, verification, review, and delivery artifacts | `packages/causaforge-core/src/phases.ts` |
 | Seven workflow agents | Adds one primary orchestrator plus phase-specific subagents for analysis, planning, building, verification, review, and delivery | `packages/causaforge-opencode/src/agents/registry.ts` |
-| Nine workflow tools | Starts workflows, records artifacts, validates artifacts, captures diffs, runs controlled verification manifests, moves phases, rolls back phases, reports status, and completes delivery | `packages/causaforge-opencode/src/tools/index.ts` |
+| Ten workflow tools | Imports Agent3 blueprint folders, starts workflows, records artifacts, validates artifacts, captures diffs, runs controlled verification manifests, moves phases, rolls back phases, reports status, and completes delivery | `packages/causaforge-opencode/src/tools/index.ts` |
 | Deterministic transition guard | Refuses phase changes when required artifacts, references, verification, review, sessions, or patch consistency are missing | `packages/causaforge-core/src/guards/transition-guard.ts` |
 | Scope-limited write guard | Allows product writes only from the building phase and only to paths approved by the patch plan | `packages/causaforge-opencode/src/hooks/tool-permission.ts` |
 | Independent review gate | Requires the reviewer session to differ from the builder session before review begins | `packages/causaforge-core/src/guards/session-guard.ts` |
@@ -171,6 +186,7 @@ The repair loop is intentionally narrow: only `patch-builder` edits product file
 | :--- | :--- |
 | `workflow_start` | Create workflow state from a problem description or imported root cause |
 | `workflow_status` | Report phase, status, and missing artifacts |
+| `workflow_import_root_cause_blueprint` | Import an external RootCauseBlueprint folder, archive its source, and start planning |
 | `workflow_record_artifact` | Persist a phase artifact and its Markdown rendering when available |
 | `workflow_validate_artifact` | Validate an artifact against its Zod schema |
 | `workflow_capture_diff` | Capture the current Git diff as the implementation patch |
@@ -222,7 +238,7 @@ bun run build
 git diff --check
 ```
 
-The root package exports the OpenCode adapter entrypoint and bundles `packages/causaforge-opencode/src/index.ts` into `dist/index.js`.
+The root package exports the OpenCode adapter entrypoint and bundles `packages/causaforge-opencode/src/index.ts` into `dist/index.js`, plus the Agent3 handoff CLI into `dist/cli.js`.
 
 ## Project Layout
 
@@ -230,8 +246,8 @@ The root package exports the OpenCode adapter entrypoint and bundles `packages/c
 packages/causaforge-core/       State machine, artifact protocol, schemas, permissions, guards
 packages/causaforge-opencode/   OpenCode adapter, agents, tools, hooks, config
 docs/diagrams/                  README architecture and workflow diagrams
-script/build.ts                 Bun build script for the plugin entrypoint
-bin/causaforge.js               CLI wrapper for local build metadata
+script/build.ts                 Bun build script for the plugin entrypoint and CLI
+bin/causaforge.js               CLI wrapper for local build metadata and RootCauseBlueprint import
 tasks/                          Execution plans, reviews, and lessons
 refactor/                       Design notes for workflow layering
 ```

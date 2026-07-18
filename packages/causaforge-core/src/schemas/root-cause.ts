@@ -7,6 +7,14 @@ export const VerificationCriterionSchema = z.object({
   required: z.boolean(),
 })
 
+export const SourceBlueprintSchema = z.object({
+  blueprintId: NonEmptyStringSchema,
+  manifestPath: NonEmptyStringSchema,
+  sourceArchivePath: NonEmptyStringSchema,
+  evidenceFiles: z.array(NonEmptyStringSchema),
+  candidateFiles: z.array(NonEmptyStringSchema),
+})
+
 export const RootCauseArtifactSchema = ArtifactBaseSchema.extend({
   problemSummary: NonEmptyStringSchema,
   reproductionEvidence: z.array(NonEmptyStringSchema).min(1),
@@ -17,8 +25,10 @@ export const RootCauseArtifactSchema = ArtifactBaseSchema.extend({
   affectedLocations: z.array(NonEmptyStringSchema).min(1),
   constraints: z.array(NonEmptyStringSchema),
   verificationCriteria: z.array(VerificationCriterionSchema).min(1),
+  sourceBlueprint: SourceBlueprintSchema.optional(),
   status: z.literal("confirmed"),
 })
 
 export type VerificationCriterion = z.infer<typeof VerificationCriterionSchema>
+export type SourceBlueprint = z.infer<typeof SourceBlueprintSchema>
 export type RootCauseArtifact = z.infer<typeof RootCauseArtifactSchema>

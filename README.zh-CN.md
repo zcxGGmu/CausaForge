@@ -66,6 +66,7 @@ CausaForge 目前是 source-first 的 OpenCode plugin。先本地构建，再让
 | :--- | :--- | :--- |
 | 从源码构建 | `bun install --ignore-scripts && bun run build` | `dist/index.js`, `dist/index.d.ts`, `dist/cli.js` |
 | 在项目中注册 | 将 `file://<repo>/dist/index.js` 加入 `.opencode/opencode.json` | OpenCode 加载 plugin id `causaforge-agent` |
+| 导入 Agent3 蓝图 | `./bin/causaforge.js import-root-cause --source <folder> --start` | `.workflow/<workflowId>/root-cause/` |
 | 使用前验证 | `bun run test && bun run typecheck && bun run build` | package 测试、类型安全和构建产物 |
 
 ### 源码设置
@@ -98,6 +99,20 @@ printf '{\n  "plugin": ["%s"]\n}\n' "$PLUGIN_PATH" > .opencode/opencode.json
 
 构建完成后再运行 OpenCode。插件会从编译后的 entrypoint 注册 workflow agents、workflow tools 和 hooks。
 
+### Agent3 RootCauseBlueprint 交接
+
+Agent3 应为每个 RootCauseBlueprint 输出一个独立文件夹，并在文件夹根部提供 `manifest.json`。用户在 Agent3 侧选择某个蓝图后，Agent3 自动调用 CausaForge：
+
+```bash
+./bin/causaforge.js import-root-cause \
+  --cwd /path/to/product-project \
+  --source /path/to/root-cause-blueprint-folder \
+  --workflow-id wf-bp-001 \
+  --start
+```
+
+CausaForge 会校验 manifest 和被引用文件，把原始目录归档到 `.workflow/<workflowId>/root-cause/source/`，写入 `.workflow/<workflowId>/root-cause/root-cause.json`，并让 workflow 从 `planning` 继续。Agent3 不应直接写 `.workflow`。
+
 ### 给 LLM Agents
 
 把下面这段发给拥有仓库 shell 权限的 agent：
@@ -120,7 +135,7 @@ printf '{\n  "plugin": ["%s"]\n}\n' "$PLUGIN_PATH" > .opencode/opencode.json
 | :--- | :--- | :--- |
 | Evidence-chain workflow | 将补丁交付拆成 root cause、plan、implementation、verification、review 和 delivery 产物 | `packages/causaforge-core/src/phases.ts` |
 | 七个 workflow agents | 提供一个 primary orchestrator，以及面向分析、计划、构建、验证、审查和交付的阶段 subagents | `packages/causaforge-opencode/src/agents/registry.ts` |
-| 九个 workflow tools | 启动 workflow、记录 artifact、校验 artifact、捕获 diff、执行受控验证 manifest、推进 phase、回滚 phase、报告状态并完成交付 | `packages/causaforge-opencode/src/tools/index.ts` |
+| 十个 workflow tools | 导入 Agent3 蓝图文件夹、启动 workflow、记录 artifact、校验 artifact、捕获 diff、执行受控验证 manifest、推进 phase、回滚 phase、报告状态并完成交付 | `packages/causaforge-opencode/src/tools/index.ts` |
 | 确定性 transition guard | 当缺少必要 artifact、引用、验证、审查、session 或 patch 一致性时拒绝阶段推进 | `packages/causaforge-core/src/guards/transition-guard.ts` |
 | Scope-limited write guard | 只允许 building 阶段写产品代码，并且只能写 patch plan 批准的路径 | `packages/causaforge-opencode/src/hooks/tool-permission.ts` |
 | Independent review gate | 要求 reviewer session 与 builder session 不同，之后才能进入 review | `packages/causaforge-core/src/guards/session-guard.ts` |
@@ -171,6 +186,7 @@ SVG 源文件：[`docs/diagrams/causaforge-iterative-agent-loop.svg`](./docs/dia
 | :--- | :--- |
 | `workflow_start` | 从问题描述或导入 root cause 创建 workflow state |
 | `workflow_status` | 报告 phase、status 和缺失 artifacts |
+| `workflow_import_root_cause_blueprint` | 导入外部 RootCauseBlueprint 文件夹、归档源目录并进入 planning |
 | `workflow_record_artifact` | 持久化阶段 artifact，并在支持时写入 Markdown rendering |
 | `workflow_validate_artifact` | 用 Zod schema 校验 artifact |
 | `workflow_capture_diff` | 捕获当前 Git diff 作为 implementation patch |
@@ -222,7 +238,7 @@ bun run build
 git diff --check
 ```
 
-Root package 导出 OpenCode adapter entrypoint，并把 `packages/causaforge-opencode/src/index.ts` 打包成 `dist/index.js`。
+Root package 导出 OpenCode adapter entrypoint，并把 `packages/causaforge-opencode/src/index.ts` 打包成 `dist/index.js`，同时把 Agent3 交接 CLI 打包成 `dist/cli.js`。
 
 ## 项目结构
 
@@ -230,8 +246,8 @@ Root package 导出 OpenCode adapter entrypoint，并把 `packages/causaforge-op
 packages/causaforge-core/       State machine, artifact protocol, schemas, permissions, guards
 packages/causaforge-opencode/   OpenCode adapter, agents, tools, hooks, config
 docs/diagrams/                  README architecture and workflow diagrams
-script/build.ts                 Bun build script for the plugin entrypoint
-bin/causaforge.js               CLI wrapper for local build metadata
+script/build.ts                 Bun build script for the plugin entrypoint and CLI
+bin/causaforge.js               CLI wrapper for local build metadata and RootCauseBlueprint import
 tasks/                          Execution plans, reviews, and lessons
 refactor/                       Design notes for workflow layering
 ```

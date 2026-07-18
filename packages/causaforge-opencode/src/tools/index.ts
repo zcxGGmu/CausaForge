@@ -1,5 +1,6 @@
 import { createWorkflowCaptureDiffTool } from "./workflow-capture-diff"
 import { createWorkflowCompleteTool } from "./workflow-complete"
+import { createWorkflowImportRootCauseBlueprintTool } from "./workflow-import-root-cause-blueprint"
 import { createWorkflowRecordArtifactTool } from "./workflow-record-artifact"
 import { createWorkflowReturnToPhaseTool } from "./workflow-return-to-phase"
 import { createWorkflowRunVerificationTool } from "./workflow-run-verification"
@@ -13,6 +14,7 @@ export function createWorkflowTools(deps: WorkflowToolDeps): WorkflowTools {
   return {
     workflow_start: createWorkflowStartTool(deps),
     workflow_status: createWorkflowStatusTool(deps),
+    workflow_import_root_cause_blueprint: createWorkflowImportRootCauseBlueprintTool(deps),
     workflow_record_artifact: createWorkflowRecordArtifactTool(deps),
     workflow_validate_artifact: createWorkflowValidateArtifactTool(),
     workflow_capture_diff: createWorkflowCaptureDiffTool(deps),

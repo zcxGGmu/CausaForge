@@ -1,5 +1,24 @@
 # CausaForge 当前执行计划
 
+## Stage 19：RootCauseBlueprint 目录包导入
+
+- [x] 写入导入工具回归测试：从 RootCauseBlueprint 文件夹生成内部 `root-cause` artifact、归档原始目录并进入 `planning`
+- [x] 写入安全边界回归测试：拒绝 manifest 中的绝对路径、`..` 路径和缺失文件引用
+- [x] 实现 `workflow_import_root_cause_blueprint` 工具，复用现有 artifact store 和 workflow start 入口
+- [x] 增加 `causaforge import-root-cause --source <folder> --start` CLI，供 Agent3 或上层 orchestrator 自动调用
+- [x] 更新 README / README.zh-CN 的工具面和 Agent3 交接说明
+- [x] 运行目标测试、全量测试、typecheck、build、严格旧标识扫描和 `git diff --check`，并保存证据
+- [x] 记录 Stage 19 review 并创建中文阶段提交
+
+### Stage 19 Review
+
+- 新增 `workflow_import_root_cause_blueprint`，可读取 Agent3 输出的 RootCauseBlueprint 文件夹，校验 `manifest.json`、引用文件和路径安全后生成内部 `root-cause` artifact。
+- 原始蓝图目录会归档到 `.workflow/<workflowId>/root-cause/source/`，内部事实源仍是 `.workflow/<workflowId>/root-cause/root-cause.json`，外部 Agent 不需要也不允许直接写 `.workflow`。
+- 新增 `sourceBlueprint` 元数据，保留 blueprint id、manifest 路径、归档路径、evidence files 和 candidate files，方便后续审计。
+- `causaforge import-root-cause --source <folder> --start` 现在是真实 CLI 入口，供 Agent3 或上层 orchestrator 自动调用；构建脚本会把它打包到 `dist/cli.js`。
+- README / README.zh-CN / ROADMAP 已同步为十个 workflow tools，并新增 Agent3 RootCauseBlueprint 交接说明。
+- 验证证据写入 `.causaforge/evidence/20260718-root-cause-blueprint-import/`：目标测试 40 passed、全量测试 106 passed、typecheck、build、真实 bin 导入探针、严格旧标识扫描和 `git diff --check` 均通过。
+
 ## Stage 18：workflow root metadata 与 diff/permission 根路径修正
 
 - [x] 写入回归测试：WorkflowState 接受可选 `gitRoot` / `productRoot`

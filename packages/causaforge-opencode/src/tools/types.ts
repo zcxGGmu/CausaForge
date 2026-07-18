@@ -47,6 +47,7 @@ export interface WorkflowTool<Input, Output> {
 export type WorkflowToolName =
   | "workflow_start"
   | "workflow_status"
+  | "workflow_import_root_cause_blueprint"
   | "workflow_record_artifact"
   | "workflow_validate_artifact"
   | "workflow_capture_diff"
@@ -73,6 +74,25 @@ export interface WorkflowStatusOutput {
   phase: WorkflowPhase
   status: WorkflowState["status"]
   missing: ArtifactKind[]
+}
+
+export interface WorkflowImportRootCauseBlueprintInput {
+  sourceDir: string
+  workflowId?: string
+  start?: boolean
+  gitRoot?: string
+  productRoot?: string
+  now?: string
+}
+
+export interface WorkflowImportRootCauseBlueprintOutput {
+  ok: true
+  workflowId: string
+  rootCauseArtifactId: string
+  phase: WorkflowPhase | null
+  artifactPath: string
+  markdownPath: string
+  sourceArchivePath: string
 }
 
 export interface WorkflowRecordArtifactInput {
@@ -155,6 +175,7 @@ export interface WorkflowCompleteInput {
 export interface WorkflowTools {
   workflow_start: WorkflowTool<WorkflowStartInput, WorkflowState>
   workflow_status: WorkflowTool<WorkflowStatusInput, WorkflowStatusOutput>
+  workflow_import_root_cause_blueprint: WorkflowTool<WorkflowImportRootCauseBlueprintInput, WorkflowImportRootCauseBlueprintOutput>
   workflow_record_artifact: WorkflowTool<WorkflowRecordArtifactInput, WorkflowRecordArtifactOutput>
   workflow_validate_artifact: WorkflowTool<WorkflowValidateArtifactInput, WorkflowValidateArtifactOutput>
   workflow_capture_diff: WorkflowTool<WorkflowCaptureDiffInput, WorkflowCaptureDiffOutput>
