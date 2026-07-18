@@ -59,6 +59,8 @@ export interface WorkflowStartInput {
   workflowId: string
   entryMode: "problem-description" | "root-cause-import"
   rootCauseArtifactId?: string
+  gitRoot?: string
+  productRoot?: string
   now?: string
 }
 

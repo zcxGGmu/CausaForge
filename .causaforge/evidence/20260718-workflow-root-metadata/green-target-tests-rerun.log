@@ -1,0 +1,37 @@
+bun test v1.3.14 (0d9b296a)
+
+packages/causaforge-opencode/src/opencode-plugin-module.test.ts:
+(pass) OpenCode plugin module hooks > uses the single active workflow for building-phase tool permission fallback [25.87ms]
+(pass) OpenCode plugin module hooks > uses workflow productRoot for product write permission paths [4.83ms]
+(pass) OpenCode plugin module hooks > allows tool execution when permission hook input shape fails [1.14ms]
+
+packages/causaforge-opencode/src/tools/tools.test.ts:
+(pass) workflow tools > registers the deterministic workflow tool surface [0.50ms]
+(pass) workflow tools > starts a workflow and reports status [0.92ms]
+(pass) workflow tools > reports the only active workflow when workflowId is omitted [0.71ms]
+(pass) workflow tools > records artifacts only when the agent owns that artifact kind [1.03ms]
+(pass) workflow tools > rejects path traversal workflow IDs [0.15ms]
+(pass) workflow tools > captures git diff through the injected runner [1.51ms]
+(pass) workflow tools > captures git diff from the workflow git root when it differs from cwd [0.81ms]
+(pass) workflow tools > runs verification manifests and preserves iteration history [9.30ms]
+(pass) workflow tools > rejects verification beyond the configured iteration limit before running commands [0.27ms]
+(pass) workflow tools > return to phase rejects terminal or forward targets [1.72ms]
+(pass) workflow tools > fails capture when git fails or diff is empty [1.20ms]
+
+packages/causaforge-core/src/schemas/schemas.test.ts:
+(pass) workflow artifact schemas > accepts minimal valid workflow state and six artifacts [1.42ms]
+(pass) workflow artifact schemas > accepts inline patch content on patch candidates [0.06ms]
+(pass) workflow artifact schemas > rejects incomplete common fields and artifact references [0.74ms]
+(pass) workflow artifact schemas > requires passing verification evidence [0.18ms]
+(pass) workflow artifact schemas > requires passing verification runs to have successful required commands [0.20ms]
+(pass) workflow artifact schemas > validates verification criterion results against the root cause [0.65ms]
+(pass) workflow artifact schemas > requires approved plan deviations before verification [0.31ms]
+(pass) workflow artifact schemas > rejects passing reviews with blocking findings [0.24ms]
+(pass) workflow artifact schemas > requires every upstream artifact for complete delivery [0.59ms]
+(pass) workflow artifact schemas > accepts only explicit workflow artifact references [0.20ms]
+(pass) workflow artifact schemas > keeps workflow terminal status, phase, and timestamps consistent [0.28ms]
+
+ 25 pass
+ 0 fail
+ 87 expect() calls
+Ran 25 tests across 3 files. [342.00ms]

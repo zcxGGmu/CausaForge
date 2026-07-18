@@ -1,5 +1,22 @@
 # CausaForge 当前执行计划
 
+## Stage 18：workflow root metadata 与 diff/permission 根路径修正
+
+- [x] 写入回归测试：WorkflowState 接受可选 `gitRoot` / `productRoot`
+- [x] 写入回归测试：`workflow_capture_diff` 使用 workflow `gitRoot` 执行 `git -C`
+- [x] 写入回归测试：tool permission 使用 workflow `productRoot` 解析产品路径
+- [x] 实现用户指定的 4 处源码修改，并同步 `WorkflowStartInput` 类型
+- [x] 运行 `bun run build`、目标测试、全量测试、typecheck、严格旧身份扫描和 `git diff --check`，并保存证据
+- [x] 记录 Stage 18 review 并创建中文阶段提交
+
+### Stage 18 Review
+
+- Workflow state schema 现在保留可选 nullable `gitRoot` / `productRoot`；`workflow_start` 会从输入写入这两个 root metadata 字段。
+- `workflow_capture_diff` 现在读取 workflow state，并在 `gitRoot` 与 adapter cwd 不同时通过 `git -C <gitRoot> diff --binary --no-ext-diff` 捕获 diff。
+- OpenCode tool permission request 现在以 workflow `productRoot` 作为产品根路径和 artifact root 基准，支持产品目录与插件 project root 分离。
+- 同步更新 `WorkflowStartInput`，否则新增 `gitRoot` / `productRoot` 输入无法通过 typecheck。
+- 验证证据写入 `.causaforge/evidence/20260718-workflow-root-metadata/`：目标测试 Red/Green、`bun run build`、全量测试 103 passed、typecheck、严格旧身份扫描和 `git diff --check` 均通过。
+
 ## Stage 17：OpenCode tool args 与 patch fallback 修正
 
 - [x] 写入回归测试：字符串化 tool args 应被权限 hook 解析

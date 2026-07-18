@@ -176,6 +176,18 @@ describe("workflow artifact schemas", () => {
     }
 
     expect(WorkflowStateSchema.safeParse(workflowState).success).toBe(true)
+    const workflowStateWithRoots = WorkflowStateSchema.safeParse({
+      ...workflowState,
+      gitRoot: "/tmp/causaforge-repo",
+      productRoot: "/tmp/causaforge-repo/product",
+    })
+    expect(workflowStateWithRoots.success).toBe(true)
+    if (workflowStateWithRoots.success) {
+      expect(workflowStateWithRoots.data).toMatchObject({
+        gitRoot: "/tmp/causaforge-repo",
+        productRoot: "/tmp/causaforge-repo/product",
+      })
+    }
     expect(RootCauseArtifactSchema.safeParse(rootCause).success).toBe(true)
     expect(PatchPlanArtifactSchema.safeParse(patchPlan).success).toBe(true)
     expect(PatchCandidateArtifactSchema.safeParse(patchCandidate).success).toBe(true)

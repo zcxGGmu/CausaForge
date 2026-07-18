@@ -21,6 +21,8 @@ export const WorkflowStateSchema = z.object({
   entryMode: z.enum(["problem-description", "root-cause-artifact"]),
   artifactRefs: WorkflowArtifactRefsSchema,
   builderSessionId: NonEmptyStringSchema.nullable(),
+  gitRoot: NonEmptyStringSchema.nullable().optional(),
+  productRoot: NonEmptyStringSchema.nullable().optional(),
   reviewerSessionId: NonEmptyStringSchema.nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),

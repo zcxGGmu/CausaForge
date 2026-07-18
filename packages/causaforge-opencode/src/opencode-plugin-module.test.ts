@@ -95,6 +95,22 @@ describe("OpenCode plugin module hooks", () => {
     }
   })
 
+  test("uses workflow productRoot for product write permission paths", async () => {
+    const project = await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-plugin-module-"))
+    try {
+      const productRoot = path.join(project, "product")
+      const hooks = await createHooks(project)
+      await enterBuilding(hooks, { productRoot })
+
+      await expect(hooks["tool.execute.before"]!(
+        { tool: "edit", sessionID: "session-builder-001", callID: "call-product-root" },
+        { args: { path: path.join(productRoot, "src", "migrate.ts") } },
+      )).resolves.toBeUndefined()
+    } finally {
+      await fs.rm(project, { recursive: true, force: true })
+    }
+  })
+
   test("allows tool execution when permission hook input shape fails", async () => {
     const project = await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-plugin-module-"))
     const warnings: string[] = []
@@ -128,6 +144,46 @@ async function createHooks(project: string) {
     experimental_workspace: { register() {} },
     $: {},
   } as never)
+}
+
+async function enterBuilding(
+  hooks: Awaited<ReturnType<typeof createHooks>>,
+  roots: { productRoot?: string } = {},
+) {
+  await callTool(hooks, "workflow_start", {
+    workflowId: "wf-001",
+    entryMode: "problem-description",
+    now: timestamp,
+    ...roots,
+  })
+  await callTool(hooks, "workflow_record_artifact", {
+    workflowId: "wf-001",
+    agentId: "root-cause-analyst",
+    artifactKind: "root-cause",
+    artifact: rootCause,
+  })
+  await callTool(hooks, "workflow_transition", {
+    workflowId: "wf-001",
+    expectedPhase: "root_cause",
+    targetPhase: "planning",
+    requestedByAgent: "root-cause-analyst",
+    sessionId: "session-root-cause-001",
+    now: timestamp,
+  })
+  await callTool(hooks, "workflow_record_artifact", {
+    workflowId: "wf-001",
+    agentId: "patch-planner",
+    artifactKind: "patch-plan",
+    artifact: patchPlan,
+  })
+  await callTool(hooks, "workflow_transition", {
+    workflowId: "wf-001",
+    expectedPhase: "planning",
+    targetPhase: "building",
+    requestedByAgent: "patch-planner",
+    sessionId: "session-planner-001",
+    now: timestamp,
+  })
 }
 
 async function callTool(hooks: Awaited<ReturnType<typeof createHooks>>, name: string, input: unknown) {

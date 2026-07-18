@@ -167,6 +167,28 @@ describe("workflow tools", () => {
       .toContain("diff --git")
   })
 
+  test("captures git diff from the workflow git root when it differs from cwd", async () => {
+    const { baseDir, gitCalls, tools } = await makeTools({
+      gitResult: {
+        exitCode: 0,
+        stdout: "diff --git a/src/migrate.ts b/src/migrate.ts\nindex 111..222 100644\n",
+        stderr: "",
+      },
+    })
+    const gitRoot = path.join(baseDir, "repo")
+    await tools.workflow_start.execute({
+      workflowId: "wf-001",
+      entryMode: "problem-description",
+      gitRoot,
+      now: timestamp,
+    } as never)
+
+    const result = await tools.workflow_capture_diff.execute({ workflowId: "wf-001" })
+
+    expect(gitCalls).toEqual([["-C", gitRoot, "diff", "--binary", "--no-ext-diff"]])
+    expect(result.changedFiles).toEqual(["src/migrate.ts"])
+  })
+
   test("runs verification manifests and preserves iteration history", async () => {
     const { baseDir, commandCalls, store, tools } = await makeTools({
       commandResults: [
@@ -244,9 +266,11 @@ describe("workflow tools", () => {
 
   test("fails capture when git fails or diff is empty", async () => {
     const failed = await makeTools({ gitResult: { exitCode: 1, stdout: "", stderr: "fatal" } })
+    await failed.tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
     await expect(failed.tools.workflow_capture_diff.execute({ workflowId: "wf-001" })).rejects.toThrow("Git diff failed")
 
     const empty = await makeTools({ gitResult: { exitCode: 0, stdout: "", stderr: "" } })
+    await empty.tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
     await expect(empty.tools.workflow_capture_diff.execute({ workflowId: "wf-001" })).rejects.toThrow("No diff captured")
   })
 })

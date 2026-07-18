@@ -15,6 +15,8 @@ export function createWorkflowStartTool(deps: WorkflowToolDeps): WorkflowTool<Wo
         status: "active",
         entryMode: input.entryMode === "root-cause-import" ? "root-cause-artifact" : "problem-description",
         artifactRefs: input.rootCauseArtifactId ? { rootCauseArtifactId: input.rootCauseArtifactId } : {},
+        gitRoot: input.gitRoot ?? null,
+        productRoot: input.productRoot ?? null,
         builderSessionId: null,
         reviewerSessionId: null,
         createdAt: now,

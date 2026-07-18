@@ -1,0 +1,72 @@
+diff --git a/packages/causaforge-core/src/schemas/workflow-state.ts b/packages/causaforge-core/src/schemas/workflow-state.ts
+index ab1fb96..091a4df 100644
+--- a/packages/causaforge-core/src/schemas/workflow-state.ts
++++ b/packages/causaforge-core/src/schemas/workflow-state.ts
+@@ -21,6 +21,8 @@ export const WorkflowStateSchema = z.object({
+   entryMode: z.enum(["problem-description", "root-cause-artifact"]),
+   artifactRefs: WorkflowArtifactRefsSchema,
+   builderSessionId: NonEmptyStringSchema.nullable(),
++  gitRoot: NonEmptyStringSchema.nullable().optional(),
++  productRoot: NonEmptyStringSchema.nullable().optional(),
+   reviewerSessionId: NonEmptyStringSchema.nullable(),
+   createdAt: z.string().datetime(),
+   updatedAt: z.string().datetime(),
+diff --git a/packages/causaforge-opencode/src/opencode-plugin-module.ts b/packages/causaforge-opencode/src/opencode-plugin-module.ts
+index 4a101dd..7d6af34 100644
+--- a/packages/causaforge-opencode/src/opencode-plugin-module.ts
++++ b/packages/causaforge-opencode/src/opencode-plugin-module.ts
+@@ -193,8 +193,8 @@ async function createToolPermissionRequest(
+     toolName: normalizeToolName(toolName),
+     agentId: state ? getAgentRoleForPhase(state.phase) : null,
+     phase: state?.phase ?? null,
+-    projectRoot,
+-    artifactRoot: path.join(projectRoot, ARTIFACT_ROOT_DIR),
++    projectRoot: state?.productRoot ?? projectRoot,
++    artifactRoot: path.join(state?.productRoot ?? projectRoot, ARTIFACT_ROOT_DIR),
+     targetPath: targetPaths[0],
+     targetPaths: targetPaths.length > 1 ? targetPaths : undefined,
+     approvedProductPaths: state ? await readApprovedProductPaths(store, state) : undefined,
+diff --git a/packages/causaforge-opencode/src/tools/types.ts b/packages/causaforge-opencode/src/tools/types.ts
+index 372858d..49180e1 100644
+--- a/packages/causaforge-opencode/src/tools/types.ts
++++ b/packages/causaforge-opencode/src/tools/types.ts
+@@ -59,6 +59,8 @@ export interface WorkflowStartInput {
+   workflowId: string
+   entryMode: "problem-description" | "root-cause-import"
+   rootCauseArtifactId?: string
++  gitRoot?: string
++  productRoot?: string
+   now?: string
+ }
+ 
+diff --git a/packages/causaforge-opencode/src/tools/workflow-capture-diff.ts b/packages/causaforge-opencode/src/tools/workflow-capture-diff.ts
+index bfba606..e613f2b 100644
+--- a/packages/causaforge-opencode/src/tools/workflow-capture-diff.ts
++++ b/packages/causaforge-opencode/src/tools/workflow-capture-diff.ts
+@@ -9,7 +9,12 @@ export function createWorkflowCaptureDiffTool(deps: WorkflowToolDeps): WorkflowT
+     name: "workflow_capture_diff",
+     description: "Capture the current git binary diff through the injected git runner.",
+     async execute(input) {
+-      const result = await deps.git.run(["diff", "--binary", "--no-ext-diff"])
++      const state = await deps.store.readWorkflow(input.workflowId)
++      const gitDir = state.gitRoot ?? deps.cwd
++      const diffArgs = gitDir !== deps.cwd
++        ? ["-C", gitDir, "diff", "--binary", "--no-ext-diff"]
++        : ["diff", "--binary", "--no-ext-diff"]
++      const result = await deps.git.run(diffArgs)
+       if (result.exitCode !== 0) throw new Error(`Git diff failed: ${result.stderr}`)
+       if (result.stdout.trim().length === 0) throw new Error("No diff captured")
+ 
+diff --git a/packages/causaforge-opencode/src/tools/workflow-start.ts b/packages/causaforge-opencode/src/tools/workflow-start.ts
+index bcda6c7..2ef8119 100644
+--- a/packages/causaforge-opencode/src/tools/workflow-start.ts
++++ b/packages/causaforge-opencode/src/tools/workflow-start.ts
+@@ -15,6 +15,8 @@ export function createWorkflowStartTool(deps: WorkflowToolDeps): WorkflowTool<Wo
+         status: "active",
+         entryMode: input.entryMode === "root-cause-import" ? "root-cause-artifact" : "problem-description",
+         artifactRefs: input.rootCauseArtifactId ? { rootCauseArtifactId: input.rootCauseArtifactId } : {},
++        gitRoot: input.gitRoot ?? null,
++        productRoot: input.productRoot ?? null,
+         builderSessionId: null,
+         reviewerSessionId: null,
+         createdAt: now,

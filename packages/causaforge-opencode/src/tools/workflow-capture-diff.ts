@@ -9,7 +9,12 @@ export function createWorkflowCaptureDiffTool(deps: WorkflowToolDeps): WorkflowT
     name: "workflow_capture_diff",
     description: "Capture the current git binary diff through the injected git runner.",
     async execute(input) {
-      const result = await deps.git.run(["diff", "--binary", "--no-ext-diff"])
+      const state = await deps.store.readWorkflow(input.workflowId)
+      const gitDir = state.gitRoot ?? deps.cwd
+      const diffArgs = gitDir !== deps.cwd
+        ? ["-C", gitDir, "diff", "--binary", "--no-ext-diff"]
+        : ["diff", "--binary", "--no-ext-diff"]
+      const result = await deps.git.run(diffArgs)
       if (result.exitCode !== 0) throw new Error(`Git diff failed: ${result.stderr}`)
       if (result.stdout.trim().length === 0) throw new Error("No diff captured")
 
