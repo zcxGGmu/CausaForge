@@ -1,1 +1,0 @@
-strict legacy scan: 0 matches

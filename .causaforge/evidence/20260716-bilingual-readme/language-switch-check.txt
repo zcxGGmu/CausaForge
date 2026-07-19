@@ -1,6 +1,0 @@
-OK README.md links to zh-CN
-OK README.zh-CN.md links to README.md
-OK README.md current language button is English
-OK README.zh-CN.md current language button is Simplified Chinese
-OK Homepage README.md remains English
-OK Chinese README contains Chinese section headings

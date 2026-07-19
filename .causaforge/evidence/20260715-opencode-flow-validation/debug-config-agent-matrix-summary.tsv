@@ -1,5 +1,0 @@
-case	exit_code	timed_out	live_db_before	live_db_after	output_file
-seven-primary-agents	0	False	280	280	debug-config-agent-matrix-seven-primary-agents.txt
-seven-subagents	0	False	280	280	debug-config-agent-matrix-seven-subagents.txt
-seven-with-tools	0	False	280	280	debug-config-agent-matrix-seven-with-tools.txt
-seven-with-hooks	0	False	280	280	debug-config-agent-matrix-seven-with-hooks.txt

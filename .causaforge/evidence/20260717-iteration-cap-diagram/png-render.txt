@@ -1,1 +1,0 @@
-PNG render/dimension check: 1200x760

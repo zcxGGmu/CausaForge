@@ -1,1 +1,0 @@
-Manual visual check: viewed rendered docs/diagrams/causaforge-architecture.png after coordinate fix. Original overlaps at Adapter/Core layer subtitles and top nodes are gone; layer headings, subtitles, node text, arrows, and labels are readable with clear spacing.

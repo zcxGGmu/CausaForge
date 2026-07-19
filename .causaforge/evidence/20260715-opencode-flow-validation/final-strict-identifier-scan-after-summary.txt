@@ -1,2 +1,0 @@
-## content scan after QA summary
-## path scan after QA summary

@@ -1,8 +1,0 @@
-case	exit_code	timed_out	live_db_before	live_db_after	output_file
-no-plugin	0	False	280	280	debug-config-matrix-no-plugin.txt
-causaforge-absolute	124	True	280	280	debug-config-matrix-causaforge-absolute.txt
-causaforge-file-url	124	True	280	280	debug-config-matrix-causaforge-file-url.txt
-empty-default-absolute	124	True	280	280	debug-config-matrix-empty-default-absolute.txt
-empty-default-file-url	0	False	280	280	debug-config-matrix-empty-default-file-url.txt
-config-default-absolute	0	False	280	280	debug-config-matrix-config-default-absolute.txt
-named-server-absolute	0	False	280	280	debug-config-matrix-named-server-absolute.txt

@@ -1,5 +1,0 @@
-command: isolated opencode debug config with local plugin
-exit_code: 127
-live_db_session_count_before: 280
-live_db_session_count_after: 280
-redacted_output: debug-config-after-fix.txt

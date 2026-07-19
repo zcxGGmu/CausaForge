@@ -1,3 +1,0 @@
-$ tsgo --noEmit -p tsconfig.json && bun run --cwd packages/causaforge-core typecheck && bun run --cwd packages/causaforge-opencode typecheck
-$ tsgo --noEmit -p tsconfig.json
-$ tsgo --noEmit -p tsconfig.json

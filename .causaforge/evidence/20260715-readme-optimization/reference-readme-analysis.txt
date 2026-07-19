@@ -1,3 +1,0 @@
-Observed user-specified reference README structure: frontloaded admonitions, centered hero/media, badge row, terse problem statement, Installation TL;DR table, human/agent install paths, Skip This README prompt, Highlights matrix, then deeper feature sections.
-Applied to CausaForge: kept factual source-first install, OpenCode plugin config, highlights matrix, workflow/agent/tool tables, architecture diagrams, configuration truth table, and non-goals.
-Claims intentionally avoided: npm publication, reviews, Discord/community, multi-language docs, multi-harness runtime, and unimplemented installer flows.

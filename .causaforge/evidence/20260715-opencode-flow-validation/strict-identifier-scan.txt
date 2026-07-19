@@ -1,2 +1,0 @@
-## tracked/worktree content scan
-## path scan

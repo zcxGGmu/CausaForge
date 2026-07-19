@@ -1,3 +1,0 @@
-Adapter PluginModule y: 185
-Core State Machine y: 185
-Top nodes start below layer headers/subtitles
