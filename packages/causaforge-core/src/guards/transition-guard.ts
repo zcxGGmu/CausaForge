@@ -85,6 +85,15 @@ function validatePhaseGate(input: TransitionGuardInput, artifacts: WorkflowArtif
   const { state, request } = input
   const transition = `${request.expectedPhase}->${request.targetPhase}`
 
+  if ((transition === "root_cause->planning" || transition === "planning->building") && hasPendingRepositoryPreparation(state)) {
+    return createError(
+      state,
+      "repository-preflight",
+      "REPOSITORY_PREPARATION_REQUIRED",
+      "Run workflow_prepare_repository and choose manual or opencode repository preparation before continuing.",
+    )
+  }
+
   if (transition === "root_cause->planning" && !artifacts.rootCause) {
     return createError(state, "root-cause-gate", "MISSING_ARTIFACT", "Record a confirmed root cause artifact before planning.")
   }
@@ -187,6 +196,10 @@ function validatePhaseGate(input: TransitionGuardInput, artifacts: WorkflowArtif
   }
 
   return null
+}
+
+function hasPendingRepositoryPreparation(state: WorkflowState): boolean {
+  return (state.repositoryPreparations ?? []).some((preparation) => preparation.status === "pending")
 }
 
 function requireArtifacts(

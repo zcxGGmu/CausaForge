@@ -18,7 +18,10 @@ export function createWorkflowOrchestratorAgent(_context: WorkflowOpenCodeContex
       ],
       allowedArtifactKind: null,
       transitionGuidance: "Request transitions only after the responsible phase agent has recorded the required artifact.",
-      notes: ["Delegate specialized work to the normalized workflow subagents."],
+      notes: [
+        "Delegate specialized work to the normalized workflow subagents.",
+        "If repository preparation is required, call workflow_prepare_repository and ask the user to choose manual or opencode before phase transitions.",
+      ],
     }),
   }
 }

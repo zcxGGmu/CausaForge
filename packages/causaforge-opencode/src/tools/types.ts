@@ -6,6 +6,7 @@ import type {
   WorkflowArtifactStore,
   WorkflowPhase,
   WorkflowState,
+  RepositoryPreparation,
   TestSuiteManifest,
 } from "@causaforge/core"
 import type { WorkflowOpenCodeConfig } from "../config/schema"
@@ -47,6 +48,7 @@ export interface WorkflowTool<Input, Output> {
 export type WorkflowToolName =
   | "workflow_start"
   | "workflow_status"
+  | "workflow_prepare_repository"
   | "workflow_import_root_cause_blueprint"
   | "workflow_record_artifact"
   | "workflow_validate_artifact"
@@ -75,6 +77,30 @@ export interface WorkflowStatusOutput {
   status: WorkflowState["status"]
   missing: ArtifactKind[]
 }
+
+export interface WorkflowPrepareRepositoryInput {
+  workflowId: string
+  softwareName?: string
+  mode?: "manual" | "opencode"
+  checkoutPath?: string
+  now?: string
+}
+
+export type WorkflowPrepareRepositoryOutput =
+  | {
+      status: "not_required"
+      repositories: RepositoryPreparation[]
+    }
+  | {
+      status: "decision_required"
+      repositories: RepositoryPreparation[]
+      options: ["manual", "opencode"]
+      message: string
+    }
+  | {
+      status: "ready"
+      repositories: RepositoryPreparation[]
+    }
 
 export interface WorkflowImportRootCauseBlueprintInput {
   sourceDir: string
@@ -175,6 +201,7 @@ export interface WorkflowCompleteInput {
 export interface WorkflowTools {
   workflow_start: WorkflowTool<WorkflowStartInput, WorkflowState>
   workflow_status: WorkflowTool<WorkflowStatusInput, WorkflowStatusOutput>
+  workflow_prepare_repository: WorkflowTool<WorkflowPrepareRepositoryInput, WorkflowPrepareRepositoryOutput>
   workflow_import_root_cause_blueprint: WorkflowTool<WorkflowImportRootCauseBlueprintInput, WorkflowImportRootCauseBlueprintOutput>
   workflow_record_artifact: WorkflowTool<WorkflowRecordArtifactInput, WorkflowRecordArtifactOutput>
   workflow_validate_artifact: WorkflowTool<WorkflowValidateArtifactInput, WorkflowValidateArtifactOutput>

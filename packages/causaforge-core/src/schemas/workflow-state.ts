@@ -13,6 +13,32 @@ export const WorkflowArtifactRefsSchema = z
   })
   .strict()
 
+export const RepositoryPreparationSchema = z
+  .object({
+    softwareName: NonEmptyStringSchema,
+    repositoryUrl: NonEmptyStringSchema,
+    commitHash: NonEmptyStringSchema,
+    metadataPath: NonEmptyStringSchema,
+    status: z.enum(["pending", "ready"]),
+    mode: z.enum(["manual", "opencode"]).optional(),
+    checkoutPath: NonEmptyStringSchema.optional(),
+    preparedAt: z.string().datetime().optional(),
+  })
+  .strict()
+  .superRefine((preparation, context) => {
+    if (preparation.status === "ready") {
+      if (!preparation.mode) {
+        context.addIssue({ code: "custom", path: ["mode"], message: "Ready repository preparation requires a mode." })
+      }
+      if (!preparation.preparedAt) {
+        context.addIssue({ code: "custom", path: ["preparedAt"], message: "Ready repository preparation requires preparedAt." })
+      }
+    }
+    if (preparation.status === "pending" && (preparation.mode || preparation.checkoutPath || preparation.preparedAt)) {
+      context.addIssue({ code: "custom", path: ["status"], message: "Pending repository preparation cannot include ready-only fields." })
+    }
+  })
+
 export const WorkflowStateSchema = z.object({
   schemaVersion: z.literal("1.0"),
   workflowId: NonEmptyStringSchema,
@@ -20,6 +46,7 @@ export const WorkflowStateSchema = z.object({
   status: z.enum(["active", "completed", "blocked"]),
   entryMode: z.enum(["problem-description", "root-cause-artifact"]),
   artifactRefs: WorkflowArtifactRefsSchema,
+  repositoryPreparations: z.array(RepositoryPreparationSchema).optional(),
   builderSessionId: NonEmptyStringSchema.nullable(),
   gitRoot: NonEmptyStringSchema.nullable().optional(),
   productRoot: NonEmptyStringSchema.nullable().optional(),
@@ -87,3 +114,4 @@ export const WorkflowStateSchema = z.object({
 
 export type WorkflowState = z.infer<typeof WorkflowStateSchema>
 export type WorkflowArtifactRefs = z.infer<typeof WorkflowArtifactRefsSchema>
+export type RepositoryPreparation = z.infer<typeof RepositoryPreparationSchema>

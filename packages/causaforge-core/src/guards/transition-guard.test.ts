@@ -119,6 +119,33 @@ describe("workflow transition guard", () => {
     expect(result).toMatchObject({ ok: false, error: { code: "MISSING_ARTIFACT" } })
   })
 
+  test("rejects root cause to planning while repository preparation is pending", () => {
+    const result = evaluateTransitionGuard({
+      state: {
+        ...stateIn("root_cause"),
+        repositoryPreparations: [
+          {
+            softwareName: "redis",
+            repositoryUrl: "https://github.com/redis/redis.git",
+            commitHash: "4f3c2b1a",
+            metadataPath: ".CausaForge/blueprint/redis/metadata.json",
+            status: "pending",
+          },
+        ],
+      },
+      request: request("root_cause", "planning"),
+      artifacts: { rootCause },
+      now: nextTimestamp,
+    })
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: {
+        code: "REPOSITORY_PREPARATION_REQUIRED",
+      },
+    })
+  })
+
   test("rejects patch plans that reference the wrong root cause artifact", () => {
     const result = evaluateTransitionGuard({
       state: stateIn("planning", { rootCauseArtifactId: rootCause.artifactId }),
@@ -131,6 +158,33 @@ describe("workflow transition guard", () => {
     })
 
     expect(result).toMatchObject({ ok: false, error: { code: "ARTIFACT_REFERENCE_MISMATCH" } })
+  })
+
+  test("rejects planning to building while repository preparation is pending", () => {
+    const result = evaluateTransitionGuard({
+      state: {
+        ...stateIn("planning", { rootCauseArtifactId: rootCause.artifactId }),
+        repositoryPreparations: [
+          {
+            softwareName: "redis",
+            repositoryUrl: "https://github.com/redis/redis.git",
+            commitHash: "4f3c2b1a",
+            metadataPath: ".CausaForge/blueprint/redis/metadata.json",
+            status: "pending",
+          },
+        ],
+      },
+      request: request("planning", "building", "session-builder-001"),
+      artifacts: { rootCause, patchPlan },
+      now: nextTimestamp,
+    })
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: {
+        code: "REPOSITORY_PREPARATION_REQUIRED",
+      },
+    })
   })
 
   test("records the builder session when entering building", () => {

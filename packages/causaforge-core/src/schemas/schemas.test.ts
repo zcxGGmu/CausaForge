@@ -176,6 +176,37 @@ describe("workflow artifact schemas", () => {
     }
 
     expect(WorkflowStateSchema.safeParse(workflowState).success).toBe(true)
+    expect(
+      WorkflowStateSchema.safeParse({
+        ...workflowState,
+        repositoryPreparations: [
+          {
+            softwareName: "redis",
+            repositoryUrl: "https://github.com/redis/redis.git",
+            commitHash: "4f3c2b1a",
+            metadataPath: ".CausaForge/blueprint/redis/metadata.json",
+            status: "pending",
+          },
+        ],
+      }).success,
+    ).toBe(true)
+    expect(
+      WorkflowStateSchema.safeParse({
+        ...workflowState,
+        repositoryPreparations: [
+          {
+            softwareName: "redis",
+            repositoryUrl: "https://github.com/redis/redis.git",
+            commitHash: "4f3c2b1a",
+            metadataPath: ".CausaForge/blueprint/redis/metadata.json",
+            status: "ready",
+            mode: "opencode",
+            checkoutPath: ".CausaForge/repositories/redis",
+            preparedAt: base.createdAt,
+          },
+        ],
+      }).success,
+    ).toBe(true)
     const workflowStateWithRoots = WorkflowStateSchema.safeParse({
       ...workflowState,
       gitRoot: "/tmp/causaforge-repo",

@@ -1,4 +1,5 @@
 import type { WorkflowState } from "@causaforge/core"
+import { discoverBlueprintSoftwareRepositories } from "../blueprint-corpus"
 import type { WorkflowStartInput, WorkflowTool, WorkflowToolDeps } from "./types"
 
 export function createWorkflowStartTool(deps: WorkflowToolDeps): WorkflowTool<WorkflowStartInput, WorkflowState> {
@@ -8,6 +9,13 @@ export function createWorkflowStartTool(deps: WorkflowToolDeps): WorkflowTool<Wo
     async execute(input) {
       const now = input.now ?? new Date().toISOString()
       const rootCauseImported = input.entryMode === "root-cause-import" && input.rootCauseArtifactId !== undefined
+      const repositoryPreparations = discoverBlueprintSoftwareRepositories(deps.cwd).map((repository) => ({
+        softwareName: repository.softwareName,
+        repositoryUrl: repository.repositoryUrl,
+        commitHash: repository.commitHash,
+        metadataPath: repository.relativeMetadataPath,
+        status: "pending" as const,
+      }))
       const state: WorkflowState = {
         schemaVersion: "1.0",
         workflowId: input.workflowId,
@@ -15,6 +23,7 @@ export function createWorkflowStartTool(deps: WorkflowToolDeps): WorkflowTool<Wo
         status: "active",
         entryMode: input.entryMode === "root-cause-import" ? "root-cause-artifact" : "problem-description",
         artifactRefs: input.rootCauseArtifactId ? { rootCauseArtifactId: input.rootCauseArtifactId } : {},
+        ...(repositoryPreparations.length > 0 ? { repositoryPreparations } : {}),
         gitRoot: input.gitRoot ?? null,
         productRoot: input.productRoot ?? null,
         builderSessionId: null,

@@ -108,10 +108,14 @@ Agent3 can pre-deliver its root-cause analysis corpus into the product project b
 <product-project>/
   .CausaForge/
     blueprint/
-      ...
+      redis/
+        metadata.json
+        ...
 ```
 
 CausaForge detects the fixed `.CausaForge/blueprint` directory from the OpenCode project root and injects that path into every workflow agent prompt. The corpus is a read-on-demand data source for root-cause analysis, planning, implementation, verification, review, and delivery work. CausaForge does not copy the whole corpus into `.workflow`; agents should cite the specific files or facts they use.
+
+When `blueprint/` contains software-named folders, each folder must include a `metadata.json` with `repository_url` and `commit_hash`. `workflow_start` records those repositories as pending preflight items, and `workflow_prepare_repository` must be used to ask whether the user will prepare the checkout manually or OpenCode should clone/fetch and checkout the specified commit.
 
 ### Single Manifest Import
 
@@ -132,7 +136,7 @@ CausaForge validates the manifest and referenced files, archives the original fo
 Paste this into an agent that has shell access to the repository:
 
 ```text
-Read README.md and ROADMAP.md. Build CausaForge with `bun install --ignore-scripts` and `bun run build`. Verify with `bun run test`, `bun run typecheck`, and `bun run build`. Then register `dist/index.js` as a file:// OpenCode plugin. Use workflow_start first, record the required phase artifact before every transition, capture the implementation diff during building, and close only through workflow_complete from delivering.
+Read README.md and ROADMAP.md. Build CausaForge with `bun install --ignore-scripts` and `bun run build`. Verify with `bun run test`, `bun run typecheck`, and `bun run build`. Then register `dist/index.js` as a file:// OpenCode plugin. Use workflow_start first, run workflow_prepare_repository when Agent3 metadata requires source preparation, record the required phase artifact before every transition, capture the implementation diff during building, and close only through workflow_complete from delivering.
 ```
 
 ## Skip This README
@@ -149,7 +153,7 @@ Read https://raw.githubusercontent.com/zcxGGmu/CausaForge/refs/heads/main/README
 | :--- | :--- | :--- |
 | Evidence-chain workflow | Splits patch delivery into root cause, plan, implementation, verification, review, and delivery artifacts | `packages/causaforge-core/src/phases.ts` |
 | Seven workflow agents | Adds one primary orchestrator plus phase-specific subagents for analysis, planning, building, verification, review, and delivery | `packages/causaforge-opencode/src/agents/registry.ts` |
-| Ten workflow tools | Imports Agent3 blueprint folders, starts workflows, records artifacts, validates artifacts, captures diffs, runs controlled verification manifests, moves phases, rolls back phases, reports status, and completes delivery | `packages/causaforge-opencode/src/tools/index.ts` |
+| Eleven workflow tools | Imports Agent3 blueprint folders, starts workflows, prepares source repositories, records artifacts, validates artifacts, captures diffs, runs controlled verification manifests, moves phases, rolls back phases, reports status, and completes delivery | `packages/causaforge-opencode/src/tools/index.ts` |
 | Deterministic transition guard | Refuses phase changes when required artifacts, references, verification, review, sessions, or patch consistency are missing | `packages/causaforge-core/src/guards/transition-guard.ts` |
 | Scope-limited write guard | Allows product writes only from the building phase and only to paths approved by the patch plan | `packages/causaforge-opencode/src/hooks/tool-permission.ts` |
 | Independent review gate | Requires the reviewer session to differ from the builder session before review begins | `packages/causaforge-core/src/guards/session-guard.ts` |
@@ -200,6 +204,7 @@ The repair loop is intentionally narrow: only `patch-builder` edits product file
 | :--- | :--- |
 | `workflow_start` | Create workflow state from a problem description or imported root cause |
 | `workflow_status` | Report phase, status, and missing artifacts |
+| `workflow_prepare_repository` | Ask whether source checkout is manual or OpenCode-managed, then record or perform repository preparation |
 | `workflow_import_root_cause_blueprint` | Import an external RootCauseBlueprint folder, archive its source, and start planning |
 | `workflow_record_artifact` | Persist a phase artifact and its Markdown rendering when available |
 | `workflow_validate_artifact` | Validate an artifact against its Zod schema |

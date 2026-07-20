@@ -75,14 +75,15 @@ describe("workflow tools", () => {
   test("registers the deterministic workflow tool surface", async () => {
     const { tools } = await makeTools()
 
-	    expect(Object.keys(tools)).toEqual([
-	      "workflow_start",
-	      "workflow_status",
-	      "workflow_import_root_cause_blueprint",
-	      "workflow_record_artifact",
-	      "workflow_validate_artifact",
-	      "workflow_capture_diff",
-	      "workflow_run_verification",
+    expect(Object.keys(tools)).toEqual([
+      "workflow_start",
+      "workflow_status",
+      "workflow_prepare_repository",
+      "workflow_import_root_cause_blueprint",
+      "workflow_record_artifact",
+      "workflow_validate_artifact",
+      "workflow_capture_diff",
+      "workflow_run_verification",
       "workflow_transition",
       "workflow_return_to_phase",
       "workflow_complete",
@@ -103,8 +104,8 @@ describe("workflow tools", () => {
     expect(status).toMatchObject({ workflowId: "wf-001", phase: "root_cause", missing: ["root-cause"] })
   })
 
-	  test("reports the only active workflow when workflowId is omitted", async () => {
-	    const { tools } = await makeTools()
+  test("reports the only active workflow when workflowId is omitted", async () => {
+    const { tools } = await makeTools()
 
     await tools.workflow_start.execute({
       workflowId: "wf-001",
@@ -114,71 +115,167 @@ describe("workflow tools", () => {
 
     const status = await tools.workflow_status.execute({} as never)
 
-	    expect(status).toMatchObject({ workflowId: "wf-001", phase: "root_cause", missing: ["root-cause"] })
-	  })
+    expect(status).toMatchObject({ workflowId: "wf-001", phase: "root_cause", missing: ["root-cause"] })
+  })
 
-	  test("imports a RootCauseBlueprint folder, archives the source, and starts planning", async () => {
-	    const { baseDir, store, tools } = await makeTools()
-	    const sourceDir = await makeBlueprintFolder(baseDir, "bp-001")
+  test("starts workflows with pending repository preparations from blueprint metadata", async () => {
+    const { baseDir, tools } = await makeTools()
+    await makeSoftwareMetadata(baseDir, "redis")
 
-	    const result = await tools.workflow_import_root_cause_blueprint.execute({
-	      sourceDir,
-	      workflowId: "wf-bp-001",
-	      start: true,
-	      now: timestamp,
-	    })
+    const state = await tools.workflow_start.execute({
+      workflowId: "wf-001",
+      entryMode: "problem-description",
+      now: timestamp,
+    })
 
-	    expect(result).toMatchObject({
-	      ok: true,
-	      workflowId: "wf-bp-001",
-	      rootCauseArtifactId: "bp-001",
-	      phase: "planning",
-	      artifactPath: getArtifactPath(baseDir, "wf-bp-001", "root-cause"),
-	      markdownPath: path.join(getWorkflowDir(baseDir, "wf-bp-001"), "root-cause", "root-cause.md"),
-	      sourceArchivePath: path.join(getWorkflowDir(baseDir, "wf-bp-001"), "root-cause", "source"),
-	    })
-	    expect(await store.readWorkflow("wf-bp-001")).toMatchObject({
-	      phase: "planning",
-	      artifactRefs: { rootCauseArtifactId: "bp-001" },
-	    })
-	    expect(await store.readArtifact("wf-bp-001", "root-cause")).toMatchObject({
-	      workflowId: "wf-bp-001",
-	      artifactId: "bp-001",
-	      problemSummary: "Build fails after Agent3 detects migration drift.",
-	      affectedLocations: ["src/migrate.ts"],
-	      verificationCriteria: [
-	        { criterionId: "test-001", description: "Run bun test src/migrate.test.ts", required: true },
-	      ],
-	      sourceBlueprint: {
-	        blueprintId: "bp-001",
-	        manifestPath: "manifest.json",
-	        sourceArchivePath: "root-cause/source",
-	        evidenceFiles: ["evidence/failing-test.log"],
-	        candidateFiles: ["files/src/migrate.ts"],
-	      },
-	    })
-	    expect(await fs.readFile(path.join(result.sourceArchivePath, "evidence", "failing-test.log"), "utf8"))
-	      .toBe("field missing\n")
-	    expect(await fs.readFile(result.markdownPath, "utf8")).toContain("bp-001")
-	  })
+    expect(state.repositoryPreparations).toEqual([
+      {
+        softwareName: "redis",
+        repositoryUrl: "https://github.com/redis/redis.git",
+        commitHash: "4f3c2b1a",
+        metadataPath: ".CausaForge/blueprint/redis/metadata.json",
+        status: "pending",
+      },
+    ])
+  })
 
-	  test("rejects unsafe RootCauseBlueprint manifest paths before writing workflow state", async () => {
-	    const { store, tools } = await makeTools()
-	    const sourceDir = await makeBlueprintFolder(await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-blueprint-")), "bp-unsafe", {
-	      evidenceFiles: ["../escape.log"],
-	    })
+  test("prepare repository returns a user decision request before mode is selected", async () => {
+    const { baseDir, tools } = await makeTools()
+    await makeSoftwareMetadata(baseDir, "redis")
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
 
-	    await expect(tools.workflow_import_root_cause_blueprint.execute({
-	      sourceDir,
-	      workflowId: "wf-bp-unsafe",
-	      start: true,
-	      now: timestamp,
-	    })).rejects.toThrow("UNSAFE_BLUEPRINT_PATH")
-	    await expect(store.readWorkflow("wf-bp-unsafe")).rejects.toThrow()
-	  })
+    const result = await tools.workflow_prepare_repository.execute({ workflowId: "wf-001" })
 
-	  test("records artifacts only when the agent owns that artifact kind", async () => {
-	    const { baseDir, tools } = await makeTools()
+    expect(result).toMatchObject({
+      status: "decision_required",
+      repositories: [
+        {
+          softwareName: "redis",
+          repositoryUrl: "https://github.com/redis/redis.git",
+          commitHash: "4f3c2b1a",
+        },
+      ],
+      options: ["manual", "opencode"],
+    })
+  })
+
+  test("prepare repository records manual source preparation", async () => {
+    const { baseDir, store, tools } = await makeTools()
+    await makeSoftwareMetadata(baseDir, "redis")
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+
+    const result = await tools.workflow_prepare_repository.execute({
+      workflowId: "wf-001",
+      softwareName: "redis",
+      mode: "manual",
+      checkoutPath: "vendor/redis",
+      now: timestamp,
+    })
+
+    expect(result).toMatchObject({ status: "ready" })
+    expect((await store.readWorkflow("wf-001")).repositoryPreparations).toEqual([
+      {
+        softwareName: "redis",
+        repositoryUrl: "https://github.com/redis/redis.git",
+        commitHash: "4f3c2b1a",
+        metadataPath: ".CausaForge/blueprint/redis/metadata.json",
+        status: "ready",
+        mode: "manual",
+        checkoutPath: "vendor/redis",
+        preparedAt: timestamp,
+      },
+    ])
+  })
+
+  test("prepare repository lets OpenCode clone and checkout the metadata commit", async () => {
+    const { baseDir, gitCalls, store, tools } = await makeTools()
+    await makeSoftwareMetadata(baseDir, "redis")
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+
+    const result = await tools.workflow_prepare_repository.execute({
+      workflowId: "wf-001",
+      softwareName: "redis",
+      mode: "opencode",
+      now: timestamp,
+    })
+
+    const checkoutPath = path.join(baseDir, ".CausaForge", "repositories", "redis")
+    expect(result).toMatchObject({ status: "ready" })
+    expect(gitCalls).toEqual([
+      ["clone", "https://github.com/redis/redis.git", checkoutPath],
+      ["-C", checkoutPath, "checkout", "4f3c2b1a"],
+    ])
+    expect((await store.readWorkflow("wf-001")).repositoryPreparations?.[0]).toMatchObject({
+      softwareName: "redis",
+      status: "ready",
+      mode: "opencode",
+      checkoutPath,
+      preparedAt: timestamp,
+    })
+  })
+
+  test("imports a RootCauseBlueprint folder, archives the source, and starts planning", async () => {
+    const { baseDir, store, tools } = await makeTools()
+    const sourceDir = await makeBlueprintFolder(baseDir, "bp-001")
+
+    const result = await tools.workflow_import_root_cause_blueprint.execute({
+      sourceDir,
+      workflowId: "wf-bp-001",
+      start: true,
+      now: timestamp,
+    })
+
+    expect(result).toMatchObject({
+      ok: true,
+      workflowId: "wf-bp-001",
+      rootCauseArtifactId: "bp-001",
+      phase: "planning",
+      artifactPath: getArtifactPath(baseDir, "wf-bp-001", "root-cause"),
+      markdownPath: path.join(getWorkflowDir(baseDir, "wf-bp-001"), "root-cause", "root-cause.md"),
+      sourceArchivePath: path.join(getWorkflowDir(baseDir, "wf-bp-001"), "root-cause", "source"),
+    })
+    expect(await store.readWorkflow("wf-bp-001")).toMatchObject({
+      phase: "planning",
+      artifactRefs: { rootCauseArtifactId: "bp-001" },
+    })
+    expect(await store.readArtifact("wf-bp-001", "root-cause")).toMatchObject({
+      workflowId: "wf-bp-001",
+      artifactId: "bp-001",
+      problemSummary: "Build fails after Agent3 detects migration drift.",
+      affectedLocations: ["src/migrate.ts"],
+      verificationCriteria: [
+        { criterionId: "test-001", description: "Run bun test src/migrate.test.ts", required: true },
+      ],
+      sourceBlueprint: {
+        blueprintId: "bp-001",
+        manifestPath: "manifest.json",
+        sourceArchivePath: "root-cause/source",
+        evidenceFiles: ["evidence/failing-test.log"],
+        candidateFiles: ["files/src/migrate.ts"],
+      },
+    })
+    expect(await fs.readFile(path.join(result.sourceArchivePath, "evidence", "failing-test.log"), "utf8"))
+      .toBe("field missing\n")
+    expect(await fs.readFile(result.markdownPath, "utf8")).toContain("bp-001")
+  })
+
+  test("rejects unsafe RootCauseBlueprint manifest paths before writing workflow state", async () => {
+    const { store, tools } = await makeTools()
+    const sourceDir = await makeBlueprintFolder(await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-blueprint-")), "bp-unsafe", {
+      evidenceFiles: ["../escape.log"],
+    })
+
+    await expect(tools.workflow_import_root_cause_blueprint.execute({
+      sourceDir,
+      workflowId: "wf-bp-unsafe",
+      start: true,
+      now: timestamp,
+    })).rejects.toThrow("UNSAFE_BLUEPRINT_PATH")
+    await expect(store.readWorkflow("wf-bp-unsafe")).rejects.toThrow()
+  })
+
+  test("records artifacts only when the agent owns that artifact kind", async () => {
+    const { baseDir, tools } = await makeTools()
     await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
 
     await expect(tools.workflow_record_artifact.execute({
@@ -361,8 +458,8 @@ async function makeTools(options: {
       },
     },
   })
-	  return { baseDir, commandCalls, gitCalls, store, tools }
-	}
+  return { baseDir, commandCalls, gitCalls, store, tools }
+}
 
 async function makeBlueprintFolder(
   baseDir: string,
@@ -389,4 +486,13 @@ async function makeBlueprintFolder(
     requiredTests: ["Run bun test src/migrate.test.ts"],
   }, null, 2)}\n`)
   return sourceDir
+}
+
+async function makeSoftwareMetadata(baseDir: string, softwareName: string): Promise<void> {
+  const metadataDir = path.join(baseDir, ".CausaForge", "blueprint", softwareName)
+  await fs.mkdir(metadataDir, { recursive: true })
+  await fs.writeFile(path.join(metadataDir, "metadata.json"), `${JSON.stringify({
+    repository_url: `https://github.com/${softwareName}/${softwareName}.git`,
+    commit_hash: "4f3c2b1a",
+  }, null, 2)}\n`)
 }
