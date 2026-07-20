@@ -66,7 +66,8 @@ CausaForge is currently a source-first OpenCode plugin. Build it locally, then p
 | :--- | :--- | :--- |
 | Build from source | `bun install --ignore-scripts && bun run build` | `dist/index.js`, `dist/index.d.ts`, `dist/cli.js` |
 | Register in a project | add `file://<repo>/dist/index.js` to `.opencode/opencode.json` | OpenCode loads plugin id `causaforge-agent` |
-| Import an Agent3 blueprint | `./bin/causaforge.js import-root-cause --source <folder> --start` | `.workflow/<workflowId>/root-cause/` |
+| Provide Agent3 analysis material | place the corpus at `.CausaForge/blueprint` | workflow agents read it on demand |
+| Import a single Agent3 manifest | `./bin/causaforge.js import-root-cause --source <folder> --start` | `.workflow/<workflowId>/root-cause/` |
 | Validate before use | `bun run test && bun run typecheck && bun run build` | package tests, type safety, and build output |
 
 ### Source Setup
@@ -99,7 +100,20 @@ printf '{\n  "plugin": ["%s"]\n}\n' "$PLUGIN_PATH" > .opencode/opencode.json
 
 Run OpenCode after building. The plugin registers the workflow agents, workflow tools, and hooks from the compiled entrypoint.
 
-### Agent3 RootCauseBlueprint Handoff
+### Agent3 Blueprint Corpus Handoff
+
+Agent3 can pre-deliver its root-cause analysis corpus into the product project before CausaForge starts:
+
+```text
+<product-project>/
+  .CausaForge/
+    blueprint/
+      ...
+```
+
+CausaForge detects the fixed `.CausaForge/blueprint` directory from the OpenCode project root and injects that path into every workflow agent prompt. The corpus is a read-on-demand data source for root-cause analysis, planning, implementation, verification, review, and delivery work. CausaForge does not copy the whole corpus into `.workflow`; agents should cite the specific files or facts they use.
+
+### Single Manifest Import
 
 Agent3 should output one folder per RootCauseBlueprint, with a `manifest.json` at the folder root. After the user chooses a blueprint in Agent3, Agent3 should call CausaForge automatically:
 

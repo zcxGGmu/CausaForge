@@ -1,6 +1,10 @@
+import fs from "node:fs/promises"
+import os from "node:os"
+import path from "node:path"
 import { describe, expect, test } from "bun:test"
 import { WORKFLOW_AGENT_IDS } from "@causaforge/core"
 import { parseWorkflowConfig } from "../config/schema"
+import { createWorkflowOpenCodeContext } from "../context"
 import { createWorkflowAgents } from "./registry"
 
 describe("workflow agent registry", () => {
@@ -42,11 +46,38 @@ describe("workflow agent registry", () => {
     })
     expect(agents["patch-reviewer"].model).toBeUndefined()
   })
+
+  test("injects the fixed blueprint corpus data source into every prompt when present", async () => {
+    const project = await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-agent-context-"))
+    try {
+      await fs.mkdir(path.join(project, ".CausaForge", "blueprint"), { recursive: true })
+      await fs.writeFile(path.join(project, ".CausaForge", "blueprint", "root-cause-notes.md"), "notes\n")
+
+      const agents = createWorkflowAgents(createWorkflowOpenCodeContext({ cwd: project }))
+
+      for (const agent of Object.values(agents)) {
+        expect(agent.prompt).toContain("Blueprint corpus:")
+        expect(agent.prompt).toContain(`Path: ${path.join(project, ".CausaForge", "blueprint")}`)
+        expect(agent.prompt).toContain("Read this corpus on demand")
+      }
+    } finally {
+      await fs.rm(project, { recursive: true, force: true })
+    }
+  })
+
+  test("omits blueprint corpus prompt instructions when the fixed path is absent", () => {
+    const agents = createWorkflowAgents(testContext())
+
+    for (const agent of Object.values(agents)) {
+      expect(agent.prompt).not.toContain("Blueprint corpus:")
+    }
+  })
 })
 
 function testContext(configInput: unknown = {}) {
   return {
     cwd: "/tmp/project",
     config: parseWorkflowConfig(configInput),
+    blueprintCorpus: null,
   }
 }

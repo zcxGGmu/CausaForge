@@ -66,7 +66,8 @@ CausaForge 目前是 source-first 的 OpenCode plugin。先本地构建，再让
 | :--- | :--- | :--- |
 | 从源码构建 | `bun install --ignore-scripts && bun run build` | `dist/index.js`, `dist/index.d.ts`, `dist/cli.js` |
 | 在项目中注册 | 将 `file://<repo>/dist/index.js` 加入 `.opencode/opencode.json` | OpenCode 加载 plugin id `causaforge-agent` |
-| 导入 Agent3 蓝图 | `./bin/causaforge.js import-root-cause --source <folder> --start` | `.workflow/<workflowId>/root-cause/` |
+| 提供 Agent3 分析素材 | 将 corpus 放到 `.CausaForge/blueprint` | workflow agents 按需读取 |
+| 导入单个 Agent3 manifest | `./bin/causaforge.js import-root-cause --source <folder> --start` | `.workflow/<workflowId>/root-cause/` |
 | 使用前验证 | `bun run test && bun run typecheck && bun run build` | package 测试、类型安全和构建产物 |
 
 ### 源码设置
@@ -99,7 +100,20 @@ printf '{\n  "plugin": ["%s"]\n}\n' "$PLUGIN_PATH" > .opencode/opencode.json
 
 构建完成后再运行 OpenCode。插件会从编译后的 entrypoint 注册 workflow agents、workflow tools 和 hooks。
 
-### Agent3 RootCauseBlueprint 交接
+### Agent3 Blueprint Corpus 交接
+
+Agent3 可以在 CausaForge 启动前，把根因分析素材 corpus 预先放到产品项目中：
+
+```text
+<product-project>/
+  .CausaForge/
+    blueprint/
+      ...
+```
+
+CausaForge 会从 OpenCode 项目根目录识别固定的 `.CausaForge/blueprint` 目录，并把该路径注入每个 workflow agent 的 prompt。这个 corpus 是 root-cause 分析、规划、实现、验证、审查和交付阶段按需读取的数据源。CausaForge 不会把整个 corpus 复制进 `.workflow`；agent 应只引用实际使用过的具体文件或事实。
+
+### 单 Manifest 导入
 
 Agent3 应为每个 RootCauseBlueprint 输出一个独立文件夹，并在文件夹根部提供 `manifest.json`。用户在 Agent3 侧选择某个蓝图后，Agent3 自动调用 CausaForge：
 
