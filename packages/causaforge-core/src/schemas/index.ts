@@ -17,6 +17,7 @@ export {
   VerificationRunCommandResultSchema,
   VerificationRunnerRefSchema,
 } from "./iteration"
+export { VerificationSourceArtifactSchema } from "./verification-source"
 export { ReviewArtifactSchema, ReviewFindingSchema } from "./review"
 export { DeliveryArtifactSchema } from "./delivery"
 
@@ -38,5 +39,6 @@ export type {
   VerificationRunCommandResult,
   VerificationRunnerRef,
 } from "./iteration"
+export type { VerificationSourceArtifact, VerificationSourceMode } from "./verification-source"
 export type { ReviewArtifact, ReviewFinding } from "./review"
 export type { DeliveryArtifact } from "./delivery"

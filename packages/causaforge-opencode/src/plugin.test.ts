@@ -10,6 +10,7 @@ const workflowToolNames = [
   "workflow_record_artifact",
   "workflow_validate_artifact",
   "workflow_capture_diff",
+  "workflow_prepare_verification_source",
   "workflow_run_verification",
   "workflow_transition",
   "workflow_return_to_phase",

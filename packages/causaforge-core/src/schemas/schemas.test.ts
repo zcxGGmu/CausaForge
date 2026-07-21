@@ -9,6 +9,7 @@ import {
   validateVerificationAgainstRootCause,
   VerificationArtifactSchema,
   VerificationRunArtifactSchema,
+  VerificationSourceArtifactSchema,
   WorkflowStateSchema,
 } from "./index"
 
@@ -129,6 +130,20 @@ const verificationRun = {
   status: "pass" as const,
 }
 
+const verificationSource = {
+  ...base,
+  artifactId: "verification-source-user",
+  patchPlanArtifactId: patchPlan.artifactId,
+  source: "user" as const,
+  manifest: testSuiteManifest,
+  official: null,
+  user: {
+    providedPath: "src/migrate.test.ts",
+    normalizedPath: "/tmp/project/src/migrate.test.ts",
+  },
+  status: "ready" as const,
+}
+
 const review = {
   ...base,
   artifactId: "review-001",
@@ -160,7 +175,7 @@ const delivery = {
 }
 
 describe("workflow artifact schemas", () => {
-  test("accepts minimal valid workflow state and six artifacts", () => {
+  test("accepts minimal valid workflow state and workflow artifacts", () => {
     const workflowState = {
       schemaVersion: "1.0",
       workflowId: base.workflowId,
@@ -225,8 +240,35 @@ describe("workflow artifact schemas", () => {
     expect(VerificationArtifactSchema.safeParse(verification).success).toBe(true)
     expect(TestSuiteManifestSchema.safeParse(testSuiteManifest).success).toBe(true)
     expect(VerificationRunArtifactSchema.safeParse(verificationRun).success).toBe(true)
+    expect(VerificationSourceArtifactSchema.safeParse(verificationSource).success).toBe(true)
     expect(ReviewArtifactSchema.safeParse(review).success).toBe(true)
     expect(DeliveryArtifactSchema.safeParse(delivery).success).toBe(true)
+  })
+
+  test("requires verification source artifacts to match their selected source", () => {
+    expect(
+      VerificationSourceArtifactSchema.safeParse({
+        ...verificationSource,
+        source: "official",
+      }).success,
+    ).toBe(false)
+    expect(
+      VerificationSourceArtifactSchema.safeParse({
+        ...verificationSource,
+        manifest: { ...testSuiteManifest, source: "official" },
+      }).success,
+    ).toBe(false)
+    expect(
+      VerificationSourceArtifactSchema.safeParse({
+        ...verificationSource,
+        official: {
+          repositoryUrl: "https://github.com/example/project.git",
+          commitHash: "abc123",
+          checkoutPath: ".CausaForge/repositories/project",
+          suitePath: "tests/migration.test.ts",
+        },
+      }).success,
+    ).toBe(false)
   })
 
   test("accepts inline patch content on patch candidates", () => {

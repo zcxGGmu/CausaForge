@@ -13,7 +13,7 @@ export function createWorkflowPrepareRepositoryTool(
 ): WorkflowTool<WorkflowPrepareRepositoryInput, WorkflowPrepareRepositoryOutput> {
   return {
     name: "workflow_prepare_repository",
-    description: "Prompt for and record source repository preparation required by Agent3 blueprint metadata.",
+    description: "Prompt for and record source repository preparation required by blueprint metadata.",
     async execute(input) {
       const state = await deps.store.readWorkflow(input.workflowId)
       const preparations = state.repositoryPreparations ?? []

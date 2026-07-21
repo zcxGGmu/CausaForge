@@ -12,6 +12,7 @@ describe("workflow permissions", () => {
     expect(canWriteArtifact("root-cause-analyst", "root-cause")).toBe(true)
     expect(canWriteArtifact("patch-planner", "patch-plan")).toBe(true)
     expect(canWriteArtifact("patch-builder", "patch-candidate")).toBe(true)
+    expect(canWriteArtifact("regression-verifier", "verification-source")).toBe(true)
     expect(canWriteArtifact("regression-verifier", "verification")).toBe(true)
     expect(canWriteArtifact("patch-reviewer", "review")).toBe(true)
     expect(canWriteArtifact("delivery-coordinator", "delivery")).toBe(true)

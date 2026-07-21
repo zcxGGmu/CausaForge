@@ -6,6 +6,7 @@ import {
   ReviewArtifactSchema,
   RootCauseArtifactSchema,
   VerificationArtifactSchema,
+  VerificationSourceArtifactSchema,
   type ArtifactBase,
 } from "../schemas"
 import type { ArtifactKind } from "./paths"
@@ -14,6 +15,7 @@ const ARTIFACT_SCHEMAS: Record<ArtifactKind, ZodType> = {
   "root-cause": RootCauseArtifactSchema,
   "patch-plan": PatchPlanArtifactSchema,
   "patch-candidate": PatchCandidateArtifactSchema,
+  "verification-source": VerificationSourceArtifactSchema,
   verification: VerificationArtifactSchema,
   review: ReviewArtifactSchema,
   delivery: DeliveryArtifactSchema,

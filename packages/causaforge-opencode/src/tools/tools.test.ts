@@ -83,6 +83,7 @@ describe("workflow tools", () => {
       "workflow_record_artifact",
       "workflow_validate_artifact",
       "workflow_capture_diff",
+      "workflow_prepare_verification_source",
       "workflow_run_verification",
       "workflow_transition",
       "workflow_return_to_phase",
@@ -241,7 +242,7 @@ describe("workflow tools", () => {
     expect(await store.readArtifact("wf-bp-001", "root-cause")).toMatchObject({
       workflowId: "wf-bp-001",
       artifactId: "bp-001",
-      problemSummary: "Build fails after Agent3 detects migration drift.",
+      problemSummary: "Build fails after the blueprint producer detects migration drift.",
       affectedLocations: ["src/migrate.ts"],
       verificationCriteria: [
         { criterionId: "test-001", description: "Run bun test src/migrate.test.ts", required: true },
@@ -347,6 +348,158 @@ describe("workflow tools", () => {
     expect(result.changedFiles).toEqual(["src/migrate.ts"])
   })
 
+  test("prepare verification source asks for official or user tests before verification", async () => {
+    const { tools } = await makeTools()
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+
+    const result = await tools.workflow_prepare_verification_source.execute({ workflowId: "wf-001" })
+
+    expect(result).toMatchObject({
+      status: "decision_required",
+      options: ["official", "user"],
+    })
+  })
+
+  test("prepare verification source records a user-provided test path and manifest", async () => {
+    const { baseDir, store, tools } = await makeTools()
+    await fs.mkdir(path.join(baseDir, "src"), { recursive: true })
+    await fs.writeFile(path.join(baseDir, "src", "migrate.test.ts"), "test('migration', () => {})\n")
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+    await store.writeArtifact("wf-001", "patch-plan", patchPlan)
+
+    const result = await tools.workflow_prepare_verification_source.execute({
+      workflowId: "wf-001",
+      mode: "user",
+      testPath: "src/migrate.test.ts",
+      now: timestamp,
+    })
+
+    expect(result).toMatchObject({
+      status: "ready",
+      artifactPath: getArtifactPath(baseDir, "wf-001", "verification-source"),
+      manifest: {
+        suiteId: "user-provided-suite",
+        source: "user",
+        runnerId: "local",
+        commands: [
+          {
+            commandId: "user-provided-tests",
+            argv: ["bun", "test", "src/migrate.test.ts"],
+            required: true,
+            timeoutSeconds: 300,
+          },
+        ],
+      },
+    })
+    expect(await store.readArtifact("wf-001", "verification-source")).toMatchObject({
+      artifactId: "verification-source-user",
+      patchPlanArtifactId: patchPlan.artifactId,
+      source: "user",
+      user: {
+        providedPath: "src/migrate.test.ts",
+        normalizedPath: path.join(baseDir, "src", "migrate.test.ts"),
+      },
+      official: null,
+      status: "ready",
+    })
+  })
+
+  test("prepare verification source records official tests from a prepared repository", async () => {
+    const { baseDir, store, tools } = await makeTools()
+    await makeSoftwareMetadata(baseDir, "redis")
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+    await store.writeArtifact("wf-001", "patch-plan", patchPlan)
+    await tools.workflow_prepare_repository.execute({
+      workflowId: "wf-001",
+      softwareName: "redis",
+      mode: "opencode",
+      now: timestamp,
+    })
+    const suitePath = path.join(".CausaForge", "repositories", "redis", "tests", "migration.test.ts")
+    await fs.mkdir(path.dirname(path.join(baseDir, suitePath)), { recursive: true })
+    await fs.writeFile(path.join(baseDir, suitePath), "test('official migration', () => {})\n")
+
+    const result = await tools.workflow_prepare_verification_source.execute({
+      workflowId: "wf-001",
+      mode: "official",
+      suitePath,
+      now: timestamp,
+    })
+
+    expect(result).toMatchObject({
+      status: "ready",
+      manifest: {
+        suiteId: "official-test-suite",
+        source: "official",
+        runnerId: "local",
+        commands: [
+          {
+            commandId: "official-tests",
+            argv: ["bun", "test", suitePath],
+            required: true,
+            timeoutSeconds: 300,
+          },
+        ],
+      },
+    })
+    expect(await store.readArtifact("wf-001", "verification-source")).toMatchObject({
+      artifactId: "verification-source-official",
+      source: "official",
+      official: {
+        repositoryUrl: "https://github.com/redis/redis.git",
+        commitHash: "4f3c2b1a",
+        suitePath,
+      },
+      user: null,
+      status: "ready",
+    })
+  })
+
+  test("rejects verification until a matching verification source is selected", async () => {
+    const { commandCalls, store, tools } = await makeTools()
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+    await store.writeArtifact("wf-001", "root-cause", rootCause)
+    await store.writeArtifact("wf-001", "patch-plan", patchPlan)
+    await store.writeArtifact("wf-001", "patch-candidate", patchCandidate)
+
+    await expect(tools.workflow_run_verification.execute({
+      workflowId: "wf-001",
+      patchCandidateArtifactId: patchCandidate.artifactId,
+      iteration: 1,
+      manifest,
+      now: timestamp,
+    })).rejects.toThrow("VERIFICATION_SOURCE_REQUIRED")
+    expect(commandCalls).toEqual([])
+  })
+
+  test("rejects verification manifests that differ from the selected source manifest", async () => {
+    const { baseDir, commandCalls, store, tools } = await makeTools()
+    await fs.mkdir(path.join(baseDir, "src"), { recursive: true })
+    await fs.writeFile(path.join(baseDir, "src", "migrate.test.ts"), "test('migration', () => {})\n")
+    await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+    await store.writeArtifact("wf-001", "root-cause", rootCause)
+    await store.writeArtifact("wf-001", "patch-plan", patchPlan)
+    await store.writeArtifact("wf-001", "patch-candidate", patchCandidate)
+    const verificationSource = await tools.workflow_prepare_verification_source.execute({
+      workflowId: "wf-001",
+      mode: "user",
+      testPath: "src/migrate.test.ts",
+      now: timestamp,
+    })
+
+    await expect(tools.workflow_run_verification.execute({
+      workflowId: "wf-001",
+      patchCandidateArtifactId: patchCandidate.artifactId,
+      iteration: 1,
+      manifest: {
+        ...manifest,
+        commands: [{ ...manifest.commands[0], argv: ["bun", "test", "src/other.test.ts"] }],
+      },
+      now: timestamp,
+    })).rejects.toThrow("VERIFICATION_MANIFEST_MISMATCH")
+    expect(commandCalls).toEqual([])
+  })
+
   test("runs verification manifests and preserves iteration history", async () => {
     const { baseDir, commandCalls, store, tools } = await makeTools({
       commandResults: [
@@ -355,15 +508,25 @@ describe("workflow tools", () => {
       ],
     })
     await tools.workflow_start.execute({ workflowId: "wf-001", entryMode: "problem-description", now: timestamp })
+    await fs.mkdir(path.join(baseDir, "src"), { recursive: true })
+    await fs.writeFile(path.join(baseDir, "src", "migrate.test.ts"), "test('migration', () => {})\n")
     await store.writeArtifact("wf-001", "root-cause", rootCause)
     await store.writeArtifact("wf-001", "patch-plan", patchPlan)
     await store.writeArtifact("wf-001", "patch-candidate", patchCandidate)
+    const verificationSource = await tools.workflow_prepare_verification_source.execute({
+      workflowId: "wf-001",
+      mode: "user",
+      testPath: "src/migrate.test.ts",
+      now: timestamp,
+    })
+    expect(verificationSource.status).toBe("ready")
+    if (verificationSource.status !== "ready") throw new Error("verification source should be ready")
 
     const failed = await tools.workflow_run_verification.execute({
       workflowId: "wf-001",
       patchCandidateArtifactId: patchCandidate.artifactId,
       iteration: 1,
-      manifest,
+      manifest: verificationSource.manifest,
       now: timestamp,
     })
 
@@ -374,7 +537,7 @@ describe("workflow tools", () => {
       cwd: baseDir,
       timeoutMs: 300_000,
     })
-    expect(await fs.readFile(path.join(getWorkflowDir(baseDir, "wf-001"), "iterations", "0001", "logs", "migration-tests.stdout.txt"), "utf8"))
+    expect(await fs.readFile(path.join(getWorkflowDir(baseDir, "wf-001"), "iterations", "0001", "logs", "user-provided-tests.stdout.txt"), "utf8"))
       .toBe("field missing")
     expect((await store.readArtifact("wf-001", "verification"))).toMatchObject({ status: "fail" })
 
@@ -382,7 +545,7 @@ describe("workflow tools", () => {
       workflowId: "wf-001",
       patchCandidateArtifactId: patchCandidate.artifactId,
       iteration: 2,
-      manifest,
+      manifest: verificationSource.manifest,
       now: "2026-07-13T00:05:00.000Z",
     })
 
@@ -474,8 +637,8 @@ async function makeBlueprintFolder(
   await fs.writeFile(path.join(sourceDir, "manifest.json"), `${JSON.stringify({
     schemaVersion: "1.0",
     blueprintId,
-    problemSummary: "Build fails after Agent3 detects migration drift.",
-    reproductionEvidence: ["Agent3 reproduced the failing migration test."],
+    problemSummary: "Build fails after the blueprint producer detects migration drift.",
+    reproductionEvidence: ["The blueprint producer reproduced the failing migration test."],
     evidenceFiles: overrides.evidenceFiles ?? ["evidence/failing-test.log"],
     observedBehavior: "The migrated field is missing.",
     expectedBehavior: "The migrated field is preserved.",

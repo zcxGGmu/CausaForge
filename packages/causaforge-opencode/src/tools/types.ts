@@ -53,6 +53,7 @@ export type WorkflowToolName =
   | "workflow_record_artifact"
   | "workflow_validate_artifact"
   | "workflow_capture_diff"
+  | "workflow_prepare_verification_source"
   | "workflow_run_verification"
   | "workflow_transition"
   | "workflow_return_to_phase"
@@ -151,6 +152,43 @@ export interface WorkflowCaptureDiffOutput {
   changedFiles: string[]
 }
 
+export type WorkflowPrepareVerificationSourceInput =
+  | {
+      workflowId: string
+      mode?: undefined
+      now?: string
+    }
+  | {
+      workflowId: string
+      mode: "official"
+      suitePath: string
+      runnerId?: string
+      now?: string
+    }
+  | {
+      workflowId: string
+      mode: "user"
+      testPath: string
+      runnerId?: string
+      now?: string
+    }
+
+export type WorkflowPrepareVerificationSourceOutput =
+  | {
+      status: "decision_required"
+      options: ["official", "user"]
+      message: string
+    }
+  | {
+      status: "repository_required"
+      message: string
+    }
+  | {
+      status: "ready"
+      artifactPath: string
+      manifest: TestSuiteManifest
+    }
+
 export interface WorkflowRunVerificationInput {
   workflowId: string
   patchCandidateArtifactId: string
@@ -206,6 +244,7 @@ export interface WorkflowTools {
   workflow_record_artifact: WorkflowTool<WorkflowRecordArtifactInput, WorkflowRecordArtifactOutput>
   workflow_validate_artifact: WorkflowTool<WorkflowValidateArtifactInput, WorkflowValidateArtifactOutput>
   workflow_capture_diff: WorkflowTool<WorkflowCaptureDiffInput, WorkflowCaptureDiffOutput>
+  workflow_prepare_verification_source: WorkflowTool<WorkflowPrepareVerificationSourceInput, WorkflowPrepareVerificationSourceOutput>
   workflow_run_verification: WorkflowTool<WorkflowRunVerificationInput, WorkflowRunVerificationOutput>
   workflow_transition: WorkflowTool<WorkflowTransitionInput, WorkflowTransitionOutput>
   workflow_return_to_phase: WorkflowTool<WorkflowReturnToPhaseInput, WorkflowTransitionOutput>

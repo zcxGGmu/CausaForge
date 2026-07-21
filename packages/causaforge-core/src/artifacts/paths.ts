@@ -6,6 +6,7 @@ export const ARTIFACT_KIND_PATHS = {
   "root-cause": ["root-cause", "root-cause.json"],
   "patch-plan": ["planning", "patch-plan.json"],
   "patch-candidate": ["implementation", "patch-candidate.json"],
+  "verification-source": ["verification", "source.json"],
   verification: ["verification", "verification.json"],
   review: ["review", "review.json"],
   delivery: ["delivery", "delivery-package.json"],

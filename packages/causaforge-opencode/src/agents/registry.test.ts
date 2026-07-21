@@ -72,6 +72,19 @@ describe("workflow agent registry", () => {
       expect(agent.prompt).not.toContain("Blueprint corpus:")
     }
   })
+
+  test("injects verification source selection skill guidance into build and verify handoffs", () => {
+    const agents = createWorkflowAgents(testContext())
+
+    for (const agentId of ["workflow-orchestrator", "patch-builder", "regression-verifier"] as const) {
+      expect(agents[agentId].prompt).toContain("causaforge-verification-source-selection")
+      expect(agents[agentId].prompt).toContain("workflow_prepare_verification_source")
+      expect(agents[agentId].prompt).toContain("workflow_run_verification")
+      expect(agents[agentId].prompt).toContain("official")
+      expect(agents[agentId].prompt).toContain("user")
+    }
+    expect(agents["patch-reviewer"].prompt).not.toContain("causaforge-verification-source-selection")
+  })
 })
 
 function testContext(configInput: unknown = {}) {

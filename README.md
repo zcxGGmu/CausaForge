@@ -66,8 +66,8 @@ CausaForge is currently a source-first OpenCode plugin. Build it locally, then p
 | :--- | :--- | :--- |
 | Build from source | `bun install --ignore-scripts && bun run build` | `dist/index.js`, `dist/index.d.ts`, `dist/cli.js` |
 | Register in a project | add `file://<repo>/dist/index.js` to `.opencode/opencode.json` | OpenCode loads plugin id `causaforge-agent` |
-| Provide Agent3 analysis material | place the corpus at `.CausaForge/blueprint` | workflow agents read it on demand |
-| Import a single Agent3 manifest | `./bin/causaforge.js import-root-cause --source <folder> --start` | `.workflow/<workflowId>/root-cause/` |
+| Provide upstream blueprint analysis material | place the corpus at `.CausaForge/blueprint` | workflow agents read it on demand |
+| Import a single RootCauseBlueprint manifest | `./bin/causaforge.js import-root-cause --source <folder> --start` | `.workflow/<workflowId>/root-cause/` |
 | Validate before use | `bun run test && bun run typecheck && bun run build` | package tests, type safety, and build output |
 
 ### Source Setup
@@ -100,9 +100,9 @@ printf '{\n  "plugin": ["%s"]\n}\n' "$PLUGIN_PATH" > .opencode/opencode.json
 
 Run OpenCode after building. The plugin registers the workflow agents, workflow tools, and hooks from the compiled entrypoint.
 
-### Agent3 Blueprint Corpus Handoff
+### Blueprint Corpus Handoff
 
-Agent3 can pre-deliver its root-cause analysis corpus into the product project before CausaForge starts:
+An upstream blueprint producer can pre-deliver its root-cause analysis corpus into the product project before CausaForge starts:
 
 ```text
 <product-project>/
@@ -119,7 +119,7 @@ When `blueprint/` contains software-named folders, each folder must include a `m
 
 ### Single Manifest Import
 
-Agent3 should output one folder per RootCauseBlueprint, with a `manifest.json` at the folder root. After the user chooses a blueprint in Agent3, Agent3 should call CausaForge automatically:
+The upstream blueprint producer should output one folder per RootCauseBlueprint, with a `manifest.json` at the folder root. After the user chooses a blueprint in that upstream tool, it should call CausaForge automatically:
 
 ```bash
 ./bin/causaforge.js import-root-cause \
@@ -129,14 +129,14 @@ Agent3 should output one folder per RootCauseBlueprint, with a `manifest.json` a
   --start
 ```
 
-CausaForge validates the manifest and referenced files, archives the original folder under `.workflow/<workflowId>/root-cause/source/`, writes `.workflow/<workflowId>/root-cause/root-cause.json`, and starts the workflow in `planning`. Agent3 must not write `.workflow` directly.
+CausaForge validates the manifest and referenced files, archives the original folder under `.workflow/<workflowId>/root-cause/source/`, writes `.workflow/<workflowId>/root-cause/root-cause.json`, and starts the workflow in `planning`. Upstream blueprint producers must not write `.workflow` directly.
 
 ### For LLM Agents
 
 Paste this into an agent that has shell access to the repository:
 
 ```text
-Read README.md and ROADMAP.md. Build CausaForge with `bun install --ignore-scripts` and `bun run build`. Verify with `bun run test`, `bun run typecheck`, and `bun run build`. Then register `dist/index.js` as a file:// OpenCode plugin. Use workflow_start first, run workflow_prepare_repository when Agent3 metadata requires source preparation, record the required phase artifact before every transition, capture the implementation diff during building, and close only through workflow_complete from delivering.
+Read README.md and ROADMAP.md. Build CausaForge with `bun install --ignore-scripts` and `bun run build`. Verify with `bun run test`, `bun run typecheck`, and `bun run build`. Then register `dist/index.js` as a file:// OpenCode plugin. Use workflow_start first, run workflow_prepare_repository when blueprint metadata requires source preparation, record the required phase artifact before every transition, capture the implementation diff during building, and close only through workflow_complete from delivering.
 ```
 
 ## Skip This README
@@ -153,7 +153,7 @@ Read https://raw.githubusercontent.com/zcxGGmu/CausaForge/refs/heads/main/README
 | :--- | :--- | :--- |
 | Evidence-chain workflow | Splits patch delivery into root cause, plan, implementation, verification, review, and delivery artifacts | `packages/causaforge-core/src/phases.ts` |
 | Seven workflow agents | Adds one primary orchestrator plus phase-specific subagents for analysis, planning, building, verification, review, and delivery | `packages/causaforge-opencode/src/agents/registry.ts` |
-| Eleven workflow tools | Imports Agent3 blueprint folders, starts workflows, prepares source repositories, records artifacts, validates artifacts, captures diffs, runs controlled verification manifests, moves phases, rolls back phases, reports status, and completes delivery | `packages/causaforge-opencode/src/tools/index.ts` |
+| Twelve workflow tools | Imports RootCauseBlueprint folders, starts workflows, prepares source repositories, selects verification sources, records artifacts, validates artifacts, captures diffs, runs controlled verification manifests, moves phases, rolls back phases, reports status, and completes delivery | `packages/causaforge-opencode/src/tools/index.ts` |
 | Deterministic transition guard | Refuses phase changes when required artifacts, references, verification, review, sessions, or patch consistency are missing | `packages/causaforge-core/src/guards/transition-guard.ts` |
 | Scope-limited write guard | Allows product writes only from the building phase and only to paths approved by the patch plan | `packages/causaforge-opencode/src/hooks/tool-permission.ts` |
 | Independent review gate | Requires the reviewer session to differ from the builder session before review begins | `packages/causaforge-core/src/guards/session-guard.ts` |
@@ -166,13 +166,33 @@ Read https://raw.githubusercontent.com/zcxGGmu/CausaForge/refs/heads/main/README
 
 SVG source: [`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaforge-workflow.svg)
 
+### End-To-End Execution Order
+
+CausaForge preflight is not a standalone phase. It is workflow state that must be cleared after `workflow_start` and before formal implementation work can proceed.
+
+| Step | Owner / Tool | Output or state | Gate meaning |
+| :--- | :--- | :--- | :--- |
+| 1. Blueprint producer pre-delivers corpus | Upstream blueprint producer | `.CausaForge/blueprint/<software>/` | CausaForge treats the corpus as a read-on-demand data source and does not copy it wholesale into `.workflow` |
+| 2. Start workflow | `workflow_start` or `workflow_import_root_cause_blueprint` | `.workflow/<workflowId>/workflow.json` | Problem-description entry starts in `root_cause`; imported root cause with `start=true` starts in `planning` |
+| 3. Repository preflight | `workflow_prepare_repository` | `repositoryPreparations[]` moves from `pending` to `ready` | If `.CausaForge/blueprint/<software>/metadata.json` provides `repository_url` / `commit_hash`, ask the user to choose manual checkout or OpenCode clone/fetch plus checkout of the specified commit |
+| 4. Confirm root cause | `root-cause-analyst` + `workflow_record_artifact` | `root-cause.json` | A confirmed root cause is required; if preflight is still pending, `root_cause -> planning` is rejected |
+| 5. Plan patch | `patch-planner` + `workflow_record_artifact` | `patch-plan.json` | The plan must reference the active root cause; if preflight is still pending, `planning -> building` is rejected |
+| 6. Build patch | `patch-builder` + `workflow_capture_diff` | `patch-candidate.json` and implementation patch | Product edits must stay inside patch-plan-approved paths, and the candidate must reference the plan |
+| 7. Select verification source | `regression-verifier` + `workflow_prepare_verification_source` | `verification/source.json` and manifest | User must choose official upstream tests or provide a concrete test path before verification can run |
+| 8. Verify regression | `regression-verifier` + `workflow_run_verification` | `verification.json` and iteration logs | Verification must use the selected-source manifest and pass root-cause criteria; failures return to `building` for rework |
+| 9. Independent review | `patch-reviewer` + `workflow_record_artifact` | `review.json` | Reviewer session must differ from builder session, and review must pass |
+| 10. Package delivery | `delivery-coordinator` + `workflow_record_artifact` | `delivery-package.json` | Delivery must reference the full artifact chain, and delivery patch content must match the implementation patch |
+| 11. Close workflow | `workflow_complete` | `completed` state | Workflow can only close from `delivering` |
+
+The key preflight effect is: **while source repository preparation remains pending, CausaForge will not allow the workflow to enter real implementation work.** Problem-description entry is blocked at `root_cause -> planning`; imported-root-cause entry is blocked at `planning -> building`, so neither entry path can bypass repository preparation.
+
 | Phase | Owner | Required artifact | Gate before next phase |
 | :--- | :--- | :--- | :--- |
 | `intake` | `workflow-orchestrator` | optional imported root cause | start from problem description or imported root cause |
 | `root_cause` | `root-cause-analyst` | `root-cause.json` | confirmed root cause exists |
 | `planning` | `patch-planner` | `patch-plan.json` | plan references the active root cause |
 | `building` | `patch-builder` | `patch-candidate.json` and captured patch | candidate references the plan and stays inside approved paths |
-| `verifying` | `regression-verifier` | `verification.json` | verification passes every root-cause criterion |
+| `verifying` | `regression-verifier` | `verification/source.json` and `verification.json` | selected-source manifest is used and verification passes every root-cause criterion |
 | `reviewing` | `patch-reviewer` | `review.json` | independent review passes |
 | `delivering` | `delivery-coordinator` | `delivery-package.json` | delivery references the full artifact chain and patch content matches |
 | `completed` | protocol state | complete artifact chain | workflow is closed |
@@ -184,7 +204,7 @@ SVG source: [`docs/diagrams/causaforge-workflow.svg`](./docs/diagrams/causaforge
 
 SVG source: [`docs/diagrams/causaforge-iterative-agent-loop.svg`](./docs/diagrams/causaforge-iterative-agent-loop.svg)
 
-The repair loop is intentionally narrow: only `patch-builder` edits product files, `workflow_run_verification` enforces `max_iterations` before executing configured local or SSH runners, and every failed or passing run is preserved under `.workflow/<workflowId>/iterations/<000N>/`. A failed required check records failure evidence and returns the workflow to `building`; an iteration above the configured cap is rejected before runner execution; only a passing verification can advance to independent review.
+The repair loop is intentionally narrow: only `patch-builder` edits product files, `workflow_prepare_verification_source` first records whether verification uses official upstream tests or a user-provided test path, `workflow_run_verification` enforces that selected manifest plus `max_iterations` before executing configured local or SSH runners, and every failed or passing run is preserved under `.workflow/<workflowId>/iterations/<000N>/`. A failed required check records failure evidence and returns the workflow to `building`; an iteration above the configured cap or a missing/stale verification source is rejected before runner execution; only a passing verification can advance to independent review.
 
 ## Agent Roster
 
@@ -194,7 +214,7 @@ The repair loop is intentionally narrow: only `patch-builder` edits product file
 | `root-cause-analyst` | subagent | Investigates the problem and records the confirmed root cause |
 | `patch-planner` | subagent | Converts the root cause into a minimal approved file-change plan |
 | `patch-builder` | subagent | Implements only approved product paths and records the patch candidate |
-| `regression-verifier` | subagent | Runs controlled verification manifests and records command evidence against root-cause criteria |
+| `regression-verifier` | subagent | Selects official or user verification tests, runs controlled manifests, and records command evidence against root-cause criteria |
 | `patch-reviewer` | subagent | Reviews patch scope, verification sufficiency, and blocking risks independently |
 | `delivery-coordinator` | subagent | Packages the final delivery artifact and handoff summary |
 
@@ -209,6 +229,7 @@ The repair loop is intentionally narrow: only `patch-builder` edits product file
 | `workflow_record_artifact` | Persist a phase artifact and its Markdown rendering when available |
 | `workflow_validate_artifact` | Validate an artifact against its Zod schema |
 | `workflow_capture_diff` | Capture the current Git diff as the implementation patch |
+| `workflow_prepare_verification_source` | Ask whether verification should use official upstream tests or a user-provided test path, then record the selected manifest |
 | `workflow_run_verification` | Run a controlled local or SSH verification manifest and preserve per-iteration logs |
 | `workflow_transition` | Evaluate transition gates and persist the next phase |
 | `workflow_return_to_phase` | Move back to an earlier phase when a gate or review requires rework |
@@ -257,7 +278,7 @@ bun run build
 git diff --check
 ```
 
-The root package exports the OpenCode adapter entrypoint and bundles `packages/causaforge-opencode/src/index.ts` into `dist/index.js`, plus the Agent3 handoff CLI into `dist/cli.js`.
+The root package exports the OpenCode adapter entrypoint and bundles `packages/causaforge-opencode/src/index.ts` into `dist/index.js`, plus the RootCauseBlueprint handoff CLI into `dist/cli.js`.
 
 ## Project Layout
 

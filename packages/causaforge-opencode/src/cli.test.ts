@@ -58,8 +58,8 @@ async function makeBlueprintFolder(baseDir: string, blueprintId: string): Promis
   await fs.writeFile(path.join(sourceDir, "manifest.json"), `${JSON.stringify({
     schemaVersion: "1.0",
     blueprintId,
-    problemSummary: "Build fails after Agent3 detects migration drift.",
-    reproductionEvidence: ["Agent3 reproduced the failing migration test."],
+    problemSummary: "Build fails after the blueprint producer detects migration drift.",
+    reproductionEvidence: ["The blueprint producer reproduced the failing migration test."],
     evidenceFiles: ["evidence/failing-test.log"],
     observedBehavior: "The migrated field is missing.",
     expectedBehavior: "The migrated field is preserved.",

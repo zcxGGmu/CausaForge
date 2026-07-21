@@ -7,6 +7,7 @@ const ARTIFACT_WRITERS: Readonly<Record<ArtifactKind, WorkflowAgentId>> = {
   "root-cause": "root-cause-analyst",
   "patch-plan": "patch-planner",
   "patch-candidate": "patch-builder",
+  "verification-source": "regression-verifier",
   verification: "regression-verifier",
   review: "patch-reviewer",
   delivery: "delivery-coordinator",

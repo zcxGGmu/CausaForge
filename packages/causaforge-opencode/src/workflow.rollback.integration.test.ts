@@ -13,34 +13,30 @@ import {
 
 describe("workflow rollback integration", () => {
   test("runs iterative verification until the patch passes", async () => {
-    const { commandCalls, plugin, store } = await createHarness({
+    const { baseDir, commandCalls, plugin, store } = await createHarness({
       commandResults: [
         { exitCode: 1, stdout: "field missing", stderr: "expected migrated field" },
         { exitCode: 0, stdout: "12 tests passed", stderr: "" },
       ],
     })
     const { rootCause, patchPlan, patchCandidate } = makeArtifactChain()
-    const manifest = {
-      suiteId: "migration-suite",
-      source: "user" as const,
-      runnerId: "local",
-      commands: [
-        {
-          commandId: "migration-tests",
-          argv: ["bun", "test", "src/migrate.test.ts"],
-          required: true,
-          timeoutSeconds: 300,
-        },
-      ],
-    }
-
     await store.initializeWorkflow(stateIn("building", {
       rootCauseArtifactId: rootCause.artifactId,
       patchPlanArtifactId: patchPlan.artifactId,
     }))
+    await fs.mkdir(path.join(baseDir, "src"), { recursive: true })
+    await fs.writeFile(path.join(baseDir, "src", "migrate.test.ts"), "test('migration', () => {})\n")
     await store.writeArtifact("wf-001", "root-cause", rootCause)
     await store.writeArtifact("wf-001", "patch-plan", patchPlan)
     await store.writeArtifact("wf-001", "patch-candidate", patchCandidate)
+    const verificationSource = await plugin.tools.workflow_prepare_verification_source.execute({
+      workflowId: "wf-001",
+      mode: "user",
+      testPath: "src/migrate.test.ts",
+      now: nextTimestamp,
+    })
+    expect(verificationSource.status).toBe("ready")
+    if (verificationSource.status !== "ready") throw new Error("verification source should be ready")
 
     await plugin.tools.workflow_transition.execute({
       workflowId: "wf-001",
@@ -54,7 +50,7 @@ describe("workflow rollback integration", () => {
       workflowId: "wf-001",
       patchCandidateArtifactId: patchCandidate.artifactId,
       iteration: 1,
-      manifest,
+      manifest: verificationSource.manifest,
       now: nextTimestamp,
     })
 
@@ -95,7 +91,7 @@ describe("workflow rollback integration", () => {
       workflowId: "wf-001",
       patchCandidateArtifactId: patchedCandidate.artifactId,
       iteration: 2,
-      manifest,
+      manifest: verificationSource.manifest,
       now: finalTimestamp,
     })
     const latestVerification = await store.readArtifact("wf-001", "verification")

@@ -9,7 +9,7 @@ import {
 } from "./blueprint-corpus"
 
 describe("blueprint corpus discovery", () => {
-  test("discovers the fixed Agent3 corpus at .CausaForge/blueprint", async () => {
+  test("discovers the fixed blueprint corpus at .CausaForge/blueprint", async () => {
     const project = await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-corpus-"))
     try {
       await fs.mkdir(path.join(project, DEFAULT_BLUEPRINT_CORPUS_RELATIVE_PATH), { recursive: true })
@@ -23,7 +23,7 @@ describe("blueprint corpus discovery", () => {
     }
   })
 
-  test("returns null when the fixed Agent3 corpus is absent", async () => {
+  test("returns null when the fixed blueprint corpus is absent", async () => {
     const project = await fs.mkdtemp(path.join(os.tmpdir(), "causaforge-corpus-"))
     try {
       expect(discoverBlueprintCorpus(project)).toBeNull()

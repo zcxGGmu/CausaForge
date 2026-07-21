@@ -12,6 +12,7 @@ import {
   type VerificationCommand,
   type VerificationRunArtifact,
   type VerificationRunCommandResult,
+  type VerificationSourceArtifact,
 } from "@causaforge/core"
 import { z } from "zod"
 import type { WorkflowVerificationRunnerConfig } from "../config/schema"
@@ -48,6 +49,8 @@ export function createWorkflowRunVerificationTool(
       if (patchCandidate.artifactId !== parsed.patchCandidateArtifactId) {
         throw new Error("PATCH_CANDIDATE_MISMATCH: verification must target the active patch candidate")
       }
+      const verificationSource = await readVerificationSource(deps, parsed.workflowId)
+      assertVerificationSourceMatches(verificationSource, patchCandidate, parsed.manifest)
 
       const runner = getRunner(deps.config.verification.runners, parsed.manifest.runnerId)
       const commandResults = await runManifestCommands(deps, parsed.workflowId, parsed.iteration, runner, parsed.manifest, parsed.now)
@@ -85,6 +88,33 @@ export function createWorkflowRunVerificationTool(
         verificationArtifactPath,
       }
     },
+  }
+}
+
+async function readVerificationSource(deps: WorkflowToolDeps, workflowId: string): Promise<VerificationSourceArtifact> {
+  try {
+    return await deps.store.readArtifact<VerificationSourceArtifact>(workflowId, "verification-source")
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+      throw new Error("VERIFICATION_SOURCE_REQUIRED: choose official or user verification source before running verification")
+    }
+    throw error
+  }
+}
+
+function assertVerificationSourceMatches(
+  verificationSource: VerificationSourceArtifact,
+  patchCandidate: PatchCandidateArtifact,
+  manifest: TestSuiteManifest,
+): void {
+  if (verificationSource.patchPlanArtifactId !== patchCandidate.patchPlanArtifactId) {
+    throw new Error("VERIFICATION_SOURCE_STALE: selected verification source must reference the active patch plan")
+  }
+  if (manifest.source !== verificationSource.source) {
+    throw new Error("VERIFICATION_SOURCE_MISMATCH: manifest source must match selected verification source")
+  }
+  if (JSON.stringify(manifest) !== JSON.stringify(verificationSource.manifest)) {
+    throw new Error("VERIFICATION_MANIFEST_MISMATCH: manifest must match the selected verification source")
   }
 }
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CausaForge Verification Source"
+  short_description: "Require official or user tests before verification"
+  default_prompt: "Use $causaforge-verification-source-selection before running CausaForge verification."

@@ -83,6 +83,22 @@ const verificationRun = {
   status: "fail" as const,
 }
 
+const verificationSource = {
+  schemaVersion: "1.0" as const,
+  workflowId: "wf-001",
+  artifactId: "verification-source-user",
+  createdAt: timestamp,
+  patchPlanArtifactId: "patch-plan-001",
+  source: "user" as const,
+  manifest: verificationRun.manifest,
+  official: null,
+  user: {
+    providedPath: "src/migrate.test.ts",
+    normalizedPath: "/tmp/project/src/migrate.test.ts",
+  },
+  status: "ready" as const,
+}
+
 describe("workflow artifact store", () => {
   test("keeps workflow paths inside the artifact root", async () => {
     const baseDir = await makeTempDir()
@@ -106,6 +122,11 @@ describe("workflow artifact store", () => {
     expect(await store.artifactExists(workflowState.workflowId, "root-cause")).toBe(true)
     const storedRootCause = await store.readArtifact<typeof rootCause>(workflowState.workflowId, "root-cause")
     expect(storedRootCause).toEqual(rootCause)
+
+    const sourcePath = await store.writeArtifact(workflowState.workflowId, "verification-source", verificationSource)
+    expect(sourcePath).toBe(getArtifactPath(baseDir, workflowState.workflowId, "verification-source"))
+    expect(await store.readArtifact<typeof verificationSource>(workflowState.workflowId, "verification-source"))
+      .toEqual(verificationSource)
 
     const workflowDirEntries = await fs.readdir(path.dirname(artifactPath))
     expect(workflowDirEntries.some((entry) => entry.endsWith(".tmp"))).toBe(false)

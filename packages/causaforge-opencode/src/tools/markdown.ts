@@ -19,6 +19,7 @@ export function renderArtifactMarkdown(artifactKind: ArtifactKind, artifact: unk
       return renderReviewMarkdown(artifact)
     case "delivery":
       return renderDeliveryMarkdown(artifact)
+    case "verification-source":
     case "patch-candidate":
       return null
   }

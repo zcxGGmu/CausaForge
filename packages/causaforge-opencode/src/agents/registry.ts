@@ -20,13 +20,42 @@ const AGENT_FACTORIES: Readonly<Record<WorkflowAgentId, WorkflowAgentFactory>> =
   "delivery-coordinator": createDeliveryCoordinatorAgent,
 }
 
+const VERIFICATION_SOURCE_SELECTION_AGENT_IDS = new Set<WorkflowAgentId>([
+  "workflow-orchestrator",
+  "patch-builder",
+  "regression-verifier",
+])
+
 export function createWorkflowAgents(context: WorkflowOpenCodeContext): WorkflowAgentRegistry {
   return Object.fromEntries(
     WORKFLOW_AGENT_IDS.map((agentId) => [
       agentId,
-      applyAgentOverride(addBlueprintCorpusInstructions(AGENT_FACTORIES[agentId](context), context), context),
+      applyAgentOverride(
+        addBlueprintCorpusInstructions(addVerificationSourceSelectionInstructions(AGENT_FACTORIES[agentId](context)), context),
+        context,
+      ),
     ]),
   ) as WorkflowAgentRegistry
+}
+
+function addVerificationSourceSelectionInstructions(agent: WorkflowAgentDefinition): WorkflowAgentDefinition {
+  if (!VERIFICATION_SOURCE_SELECTION_AGENT_IDS.has(agent.id)) return agent
+  return {
+    ...agent,
+    prompt: `${agent.prompt}\n\n${renderVerificationSourceSelectionInstructions()}`,
+  }
+}
+
+function renderVerificationSourceSelectionInstructions(): string {
+  return [
+    "Verification source selection skill:",
+    "- Automatically use $causaforge-verification-source-selection after a patch-candidate is ready and before workflow_run_verification.",
+    "- Call workflow_prepare_verification_source first without mode so the user must choose official or user verification tests.",
+    "- For official, ensure the current software repository is prepared, inspect its checkout, choose a concrete suitePath, then call workflow_prepare_verification_source with mode official.",
+    "- For user, require a concrete testPath from the user, then call workflow_prepare_verification_source with mode user.",
+    "- Pass only the manifest returned by workflow_prepare_verification_source to workflow_run_verification.",
+    "- Reuse the selected source across repair iterations unless the user changes it or the active patch plan changes.",
+  ].join("\n")
 }
 
 function addBlueprintCorpusInstructions(
@@ -45,7 +74,7 @@ function renderBlueprintCorpusInstructions(corpus: BlueprintCorpusMetadata): str
     "Blueprint corpus:",
     `- Path: ${corpus.rootPath}`,
     `- Relative path: ${corpus.relativePath}`,
-    "- Read this corpus on demand when root-cause, planning, implementation, verification, review, or delivery work needs Agent3 analysis material.",
+    "- Read this corpus on demand when root-cause, planning, implementation, verification, review, or delivery work needs upstream blueprint analysis material.",
     "- Do not copy the whole corpus into workflow artifacts; cite the specific files or facts used.",
   ].join("\n")
 }
